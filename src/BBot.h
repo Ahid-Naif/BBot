@@ -241,11 +241,43 @@ class BBot{
       @return:
       void
       ----------
+      if the goalMode set to RFID1(cardGamer): this function will work simultaneously with IRs(_) function
+      where IRs(_) function will perform line following and whenever the robot read new RFID card the RFID(_)
+      will be activiated and it will perform the command assigned with the card.
     */
     void RFID(int cardId);
+    /**
+      linkCurrentCardWithAction function:
+      @params:
+      cardAction: string correspond to each command that needed to be assigned to current card.
+      @return:
+      void
+      ----------
+      link the current card with the needed action.
+    */
     void linkCurrentCardWithAction(String cardAction);
-    bool countOnSevenSegment(int from, int to, int delayDuration);
+    /**
+      setNumberOnSevenSegment function:
+      @params:
+      number: the needed number to be shown on the 7-segment(0-9)
+      @return:
+      void
+      ----------
+      set the needed number on the 7-segment chip.
+    */
     void setNumberOnSevenSegment(int number);
+    /**
+      countOnSevenSegment function:
+      @params:
+      from: starting point
+      to: ending point
+      delayDuration: the needed delay between each iteration
+      @return:
+      void
+      ----------
+      it uses setNumberOnSevenSegment(_) to count from-to specific numbers with given delay.
+    */
+    bool countOnSevenSegment(int from, int to, int delayDuration);
     /**
       teleoperation function:
       @params:
@@ -268,8 +300,15 @@ class BBot{
       perform the actual movement of the robot.
     */
     void movement(void);
-    bool goToTheRight(void);
-    bool goToTheLeft(void);
+    /**
+      distanceFromUltrasonic function:
+      @params:
+      void
+      @return:
+      float value of the measured distance from the ultrasonic.
+      ----------
+      perform the actual movement of the robot.
+    */
     float distanceFromUltrasonic();
     /**
       getValueFromString function:
@@ -300,7 +339,7 @@ class BBot{
       @return:
       void
       ----------
-      stop every thing in the robot forever.
+      stop every thing in the robot.
     */
     void stopForever(void);
     bool isRegisteredIn(int cardId, String action);

@@ -176,7 +176,7 @@ void BBot::RFID(int cardId){
     }else{
       Serial.print("C1");
     }
-    for (int i = 0; i < numberOfPulses; i++) {
+    for(int i = 0; i < numberOfPulses; i++) {
       dw(this->_greenLED, 1);
       dw(this->_buzzer, 1);
       delay(50);
@@ -240,7 +240,7 @@ void BBot::RFID(int cardId){
 
 void BBot::linkCurrentCardWithAction(String cardAction){
   this->isActive = true;
-  if(cardAction == "R"){ //link the current card with the needed action
+  if(cardAction == "R"){
     for (int i = 0; i < 10; i++) {
       if(this->rightCards[i] == 0){
         this->rightCards[i] = this->currentCardId;
@@ -258,11 +258,11 @@ void BBot::linkCurrentCardWithAction(String cardAction){
     this->stopCard = this->currentCardId;
     this->doneSetup = true;
     this->isActive = false;
-  }else if(cardAction == "F"){
+  }else if(cardAction == "F"){ //forward
 
-  }else if(cardAction == "SU"){
+  }else if(cardAction == "SU"){ //speed up
 
-  }else if(cardAction == "SL"){
+  }else if(cardAction == "SL"){ //slow down
 
   }
 }
@@ -417,46 +417,22 @@ void BBot::movement(){
       break;
     }
   }
-    this->_velocityRightMotor = constrain((this->_linearVelocity - constants.b * this->_angularVelocity),-255,255);
-    this->_velocityLeftMotor = constrain((this->_linearVelocity + constants.b * this->_angularVelocity),-255,255);
-    if(this->_velocityRightMotor<0){
-        analogWrite(this->_motorA1,abs(this->_velocityRightMotor));
-        analogWrite(this->_motorA2,0);
-    }else{
-        analogWrite(this->_motorA1,0);
-        analogWrite(this->_motorA2,this->_velocityRightMotor);
-    }
-    if(this->_velocityLeftMotor<0){
-        analogWrite(this->_motorB1,abs(this->_velocityLeftMotor));
-        analogWrite(this->_motorB2,0);
-    }else{
-        analogWrite(this->_motorB1,0);
-        analogWrite(this->_motorB2,this->_velocityLeftMotor);
-    }
-}
-
-bool BBot::goToTheRight(void){
-  this->teleoperation(0,-20);
-  if(
-    (!dr(this->_IR1) && !dr(this->_IR2) && dr(this->_IR3))
-    ||
-    (!dr(this->_IR1) && dr(this->_IR2) && dr(this->_IR3))
-  ){
-    return true;
+  this->_velocityRightMotor = constrain((this->_linearVelocity - constants.b * this->_angularVelocity),-255,255);
+  this->_velocityLeftMotor = constrain((this->_linearVelocity + constants.b * this->_angularVelocity),-255,255);
+  if(this->_velocityRightMotor<0){
+      analogWrite(this->_motorA1,abs(this->_velocityRightMotor));
+      analogWrite(this->_motorA2,0);
+  }else{
+      analogWrite(this->_motorA1,0);
+      analogWrite(this->_motorA2,this->_velocityRightMotor);
   }
-  return false;
-}
-
-bool BBot::goToTheLeft(void){
-  this->teleoperation(0,20);
-  if(
-    (dr(this->_IR1) && !dr(this->_IR2) && !dr(this->_IR3))
-    ||
-    (dr(this->_IR1) && dr(this->_IR2) && !dr(this->_IR3))
-  ){
-    return true;
+  if(this->_velocityLeftMotor<0){
+      analogWrite(this->_motorB1,abs(this->_velocityLeftMotor));
+      analogWrite(this->_motorB2,0);
+  }else{
+      analogWrite(this->_motorB1,0);
+      analogWrite(this->_motorB2,this->_velocityLeftMotor);
   }
-  return false;
 }
 
 float BBot::distanceFromUltrasonic(){
@@ -484,7 +460,7 @@ String BBot::getValueFromString(String data, char separator, int index){
 }
 
 // Private methods
-void BBot::stopForever(){
+void BBot::stopForever(){//need to be updated later
   this->isActive = false;
 }
 
