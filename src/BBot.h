@@ -106,11 +106,11 @@ enum Action{
   SlowDown
 };
 /**
-> BBot main Class
-@params
-  when an instance object created
-  a reference of SoftwareSerial (NOT HardwareSerial!)
-  object should be send.
+  BBot main Class (constructor)
+  @params:
+    when an instance object created
+    a reference of SoftwareSerial (NOT HardwareSerial!)
+    object should be send.
 */
 class BBot{
   public:
@@ -178,16 +178,11 @@ class BBot{
     void setupIRs(int leftIR, int middleIR, int rightIR);
     /**
       setupSevenSegment function:
-        _
-      |   |
-        -
-      |   |
-        -
-        a
-      f   b
-        g
-      e   c
-        d
+        _         a
+      |   |     f   b
+        -   =>    g
+      |   |     e   c
+        -         d
       @params:
       a: digital pin connected with a on 7-segment
       b: digital pin connected with b on 7-segment
@@ -249,8 +244,6 @@ class BBot{
     */
     void RFID(int cardId);
     void linkCurrentCardWithAction(String cardAction);
-    
-
     bool countOnSevenSegment(int from, int to, int delayDuration);
     void setNumberOnSevenSegment(int number);
     /**
@@ -278,7 +271,26 @@ class BBot{
     bool goToTheRight(void);
     bool goToTheLeft(void);
     float distanceFromUltrasonic();
+    /**
+      getValueFromString function:
+      @params:
+      data: string needed to be splitted.
+      separator: the separator that the given string will be divided based on it.
+      index: the index needed after executing the function.
+      @return:
+      void
+      ----------
+      handy function used to seprate(split) given string into several parts.
+      example of usage:
+      String str = "S:1";
+      String operation = myRobot.getValueFromString(str, ':', 0); //return `S`
+    */
     String getValueFromString(String data, char separator, int index);
+    /*
+      isActive is a tricky part of the logic because it used in many different cases,
+      but it's pretty useful in most of the critical cases where you want to
+      deactivate the movement for some seconds.
+    */
     bool isActive;
   private:
     /**
