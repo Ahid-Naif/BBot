@@ -16,7 +16,7 @@
   Science, Technology, Engineering and Mathematics.
   ==========================
   ->B-Bot Library
-  ->github:
+  ->github: https://github.com/RachisSystems/B-Bot
   ->website: https://www.rachissystems.com
   ==========================
   Important Note:
@@ -78,8 +78,8 @@ forward = 604
   ## Available Modes:
   ------------------
   1. Teleoperation
-  2. RFID level 1
-  3. RFID level 2
+  2. RFID level 1 (cardGamer)
+  3. RFID level 2 (cardProgrammer)
   4. RFID programming
   5. Pure line-following
 */
@@ -109,12 +109,21 @@ enum Action{
 > BBot main Class
 @params
   when an instance object created
-  a reference of SoftwareSerial
+  a reference of SoftwareSerial (NOT HardwareSerial!)
   object should be send.
 */
 class BBot{
   public:
     BBot(SoftwareSerial& serial, Mode mode);
+    /**
+      ResetEveryThing function:
+      @params:
+      void
+      @return:
+      void
+      ----------
+      Turns off all LEDs, reset currentCardId to zero and it call setNumberOnSevenSegment(-1) to clear 7-segment output.
+    */
     void ResetEveryThing(void);
     /**
       setMode function:
@@ -126,40 +135,117 @@ class BBot{
       Can be called at any time or place.
     */
     void setMode(Mode mode);
-    Mode getMode(void);
     /**
-      setup functions:
+      getMode function:
+      @params:
+      void
+      @return:
+      Mode: the current mode stored in the object
+      ----------
+      Can be called at any time or place.
+    */
+    Mode getMode(void);
+    /** SETUP FUNCTIONS **/
+    /**
+      setupMotors function:
+      @params:
+      motorA1: connected pin for motor A with first terminal
+      motorA2: connected pin for motor A with second terminal
+      motorB1: connected pin for motor B with first terminal
+      motorB1: connected pin for motor B with second terminal
+      @return:
+      void
+      ----------
+      called in void setup function.
     */
     void setupMotors(int motorA1, int motorA2, int motorB1, int motorB2);
+    /**
+      setupIRs function:
+         ---
+       L/ M \R
+        |   |
+        |---|
+      @params:
+      leftIR: L.
+      middleIR: M.
+      rightIR: R.
+      @return:
+      void
+      ----------
+      called in void setup function to setup the three connected IRs sensors
+      to the robot, which can be handy in this class to deal with.
+    */
     void setupIRs(int leftIR, int middleIR, int rightIR);
+    /**
+      setupSevenSegment function:
+        _
+      |   |
+        -
+      |   |
+        -
+        a
+      f   b
+        g
+      e   c
+        d
+      @params:
+      a: digital pin connected with a on 7-segment
+      b: digital pin connected with b on 7-segment
+      c: digital pin connected with c on 7-segment
+      d: digital pin connected with d on 7-segment
+      e: digital pin connected with e on 7-segment
+      f: digital pin connected with f on 7-segment
+      g: digital pin connected with g on 7-segment
+      @return:
+      void
+      ----------
+      called in void setup function.
+      feel free to use other method for 7-segment like i2c,
+      we had chosen the simplest one for educational purpose.
+    */
     void setupSevenSegment(int a, int b, int c, int d, int e, int f, int g);
+    /**
+      setupUltrasonic function:
+      @params:
+      trig: the digital pin that connected to trig terminal on the ultrasonic
+      echo: the digital pin that connected to echo terminal on the ultrasonic
+      @return:
+      void
+      ----------
+      called in void setup function.
+    */
     void setupUltrasonic(int trig, int echo);
+    /**
+      setupCircuitComponents function:
+      @params:
+      redLED: the digital pin that connected to the red LED.
+      greenLED: the digital pin that connected to the green LED.
+      buzzer: the digital pin that connected to the buzzer.
+      @return:
+      void
+      ----------
+      called in void setup function.
+      MAKE SURE to limit the current by adding two resistors in series with the two red and green LEDs.
+    */
     void setupCircuitComponents(int redLED, int greenLED, int buzzer);
     /**
       IRs function:
       @params:
-      values: values of the connected IRs (left, middle, right)
+      vodi
       @return:
       void
       ----------
-      Works with:
-      1. Line follwing
-      2. RFID1
-      3. RFID2
-      4. RFID programming
+      perform Line Follwing operation.
+      make sure to switch to line following mode using setMode(_) function so that this function can work.
     */
     void IRs();
     /**
       RFID function:
       @params:
-      cardId: the sum of the read card's bytes
+      cardId: the sum of the read card's bits
       @return:
       void
       ----------
-      Works with:
-      1. RFID1
-      2. RFID2
-      3. RFID programming
     */
     void RFID(int cardId);
     void linkCurrentCardWithAction(String cardAction);

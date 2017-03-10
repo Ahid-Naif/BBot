@@ -10,7 +10,6 @@ const struct {
   int omegaMin = -255;
   int velocityMax = 255;
   int velocityMin = -255;
-  double v_stop = 0;
   double v_move = 160;
   int w_turn = 70;
   int w_sharpTurn = 100;
