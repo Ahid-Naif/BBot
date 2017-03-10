@@ -249,22 +249,21 @@ class BBot{
     */
     void RFID(int cardId);
     void linkCurrentCardWithAction(String cardAction);
+    
+
+    bool countOnSevenSegment(int from, int to, int delayDuration);
+    void setNumberOnSevenSegment(int number);
     /**
       teleoperation function:
-      this function takes the rotation of the x any y axises from the mobile app based on
-      the communication protocol. The minimum value for x and y axises is -45 degree and
-      the maximum is 45 degree, however, it will affect the values of _linearVelocity, _angularVelocity only.
       @params:
       xAxis(int), yAxis(int)
       @return:
       void
       ----------
-      Works with:
-      1. Teleoperation
+      this function takes the rotation of the x any y axises from the mobile app based on
+      the communication protocol. The minimum value for x and y axises is -45 degree and
+      the maximum is 45 degree, however, it will affect the values of _linearVelocity, _angularVelocity only.
     */
-
-    bool countOnSevenSegment(int from, int to, int delayDuration);
-    void setNumberOnSevenSegment(int number);
     void teleoperation(int xAxis,int yAxis);
     /**
       movement function:
@@ -273,13 +272,7 @@ class BBot{
       @return:
       void
       ----------
-      Works with:
-      1. Line follwing
-      2. RFId1
-      3. RFID2
-      4. RFID programming
-      5. Teleoperation
-      6. Controllable
+      perform the actual movement of the robot.
     */
     void movement(void);
     bool goToTheRight(void);
@@ -288,39 +281,61 @@ class BBot{
     String getValueFromString(String data, char separator, int index);
     bool isActive;
   private:
+    /**
+      stopForever function:
+      @params:
+      void
+      @return:
+      void
+      ----------
+      stop every thing in the robot forever.
+    */
     void stopForever(void);
     bool isRegisteredIn(int cardId, String action);
     /**
-      _serial: the reference of the initialized object from SoftwareSerial class, used in the communication between the app and the robot.
+      _serial: the reference of the initialized object from SoftwareSerial class,
+      used in the communication between the app and the robot.
     */
     SoftwareSerial& _serial;
-    /*
-      * isReady: block the robot from its movement and wait for activation code from the app or any custom event.
-      * _motorA1:
-      * _motorA2:
-      * _motorB1:
-      * _motorB2:
-      * _IR1:
-      * _IR2:
-      * _IR3:
-      * _linearVelocity:
-      * _angularVelocity:
-      * _velocityLeftMotor:
-      * _velocityRightMotor:
-    */
+    /** other useful private variables **/
     int _motorA1, _motorA2, _motorB1, _motorB2;
     int _IR1, _IR2, _IR3;
     int _a, _b, _c, _d, _e, _f, _g; //seven segment
     int _trig, _echo;
     int _greenLED, _redLED, _buzzer;
+    /*
+      _velocityLeftMotor and _velocityRightMotor: used after applying mathematical equation in movement(_)
+      function where this values will assigned to the left and right motors respectively.
+    */
     double _linearVelocity, _angularVelocity, _velocityLeftMotor, _velocityRightMotor;
-    int numberOfCardCanBeReadRFID1;
+    /*
+      numberOfCardCanBeRead: used to count how many cards left can be read before losing the match in RFID1 and RFID2.
+    */
+    int numberOfCardCanBeRead;
     int rightCards[10];
     int leftCards[10];
     int stopCard;
+    /*
+      the differance between mode and goalMode is that mode can be changed
+      according to the need anytime but goalMode cannot be changed while the
+      game is running where changing it can be done using the app only.
+    */
     Mode mode, goalMode;
+    /*
+      action variable used in RFID operation where it can be changed according 
+      to the action read on the card.
+    */
     Action action;
+    /*
+      store the card's ID that has been read previously, it's useful to assign the
+      command from the app to this card in linkCurrentCardWithAction(_) function.
+    */
     int currentCardId;
+    /*
+      a boolean indicator used in RFID2 where its value changed to true when the
+      command sent from the app telling it that the setup for the cards is done
+      and ready to play the game on the programmed command on each card.
+    */
     bool doneSetup;
 };
 

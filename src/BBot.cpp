@@ -22,7 +22,7 @@ BBot::BBot(SoftwareSerial& serial, Mode mode): _serial(serial){
   this->_angularVelocity = 0;
   this->_linearVelocity = 0;
   this->goalMode = mode;
-  this->numberOfCardCanBeReadRFID1 = 9;
+  this->numberOfCardCanBeRead = 9;
   this->currentCardId = 0;
   this->doneSetup = false;
   this->rightCards[10] = {0};
@@ -30,7 +30,7 @@ BBot::BBot(SoftwareSerial& serial, Mode mode): _serial(serial){
 }
 
 void BBot::ResetEveryThing(){
-  this->numberOfCardCanBeReadRFID1 = 9;
+  this->numberOfCardCanBeRead = 9;
   this->currentCardId = 0;
   this->setNumberOnSevenSegment(-1);
   dw(this->_buzzer,0);
@@ -154,9 +154,9 @@ void BBot::RFID(int cardId){
       dw(this->_buzzer, 0);
       delay(50);
     }
-    this->setNumberOnSevenSegment(numberOfCardCanBeReadRFID1);
-    numberOfCardCanBeReadRFID1--;
-    if(numberOfCardCanBeReadRFID1 == -1){
+    this->setNumberOnSevenSegment(numberOfCardCanBeRead);
+    numberOfCardCanBeRead--;
+    if(numberOfCardCanBeRead == -1){
       dw(this->_redLED,1);
     }
   }else if(this->goalMode == RFID2){
@@ -194,9 +194,9 @@ void BBot::RFID(int cardId){
         dw(this->_buzzer, 0);
         delay(50);
       }
-      this->setNumberOnSevenSegment(numberOfCardCanBeReadRFID1);
-      numberOfCardCanBeReadRFID1--;
-      if(numberOfCardCanBeReadRFID1 == -1){
+      this->setNumberOnSevenSegment(numberOfCardCanBeRead);
+      numberOfCardCanBeRead--;
+      if(numberOfCardCanBeRead == -1){
         dw(this->_redLED,1);
       }
     }
