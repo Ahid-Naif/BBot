@@ -2,7 +2,7 @@
 #include <BBot.h>
 #include <string.h>
 
-int motorA1 = 9, motorA2 = 8, motorB1 = 11, motorB2 = 12;
+int motorA1 = 9, motorA2 = 8, motorB1 = 10, motorB2 = 11;
 int redLED = 2, greenLED = 3, buzzer= 4;
 int trig = 6, echo = 7;
 String str;
@@ -42,7 +42,7 @@ void setup() {
 
 void loop(){
   if(myRobot.isActive){
-    if(myRobot.distanceFromUltrasonic() > 9 && myRobot.distanceFromUltrasonic() < 40){
+    if(myRobot.distanceFromUltrasonic() > 40){
       Serial.print("F");
       myRobot.isActive = !myRobot.isActive;
       for(int i = 0 ; i < 3 ; i++){

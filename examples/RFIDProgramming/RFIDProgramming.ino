@@ -4,23 +4,39 @@
 #include <BBot.h>
 #include <string.h>
 int leftIR = 37, middleIR = 38, rightIR = 39;
-int motorA1 = 9, motorA2 = 8, motorB1 = 11, motorB2 = 10;
+int motorA1 = 9, motorA2 = 8, motorB1 = 10, motorB2 = 11;
 int redLED = 2, greenLED = 3, buzzer= 4;
 int a = 46, b = 47, c = 43, d = 45, e = 44, f = 49, g = 48;
 int trig = 6, echo = 7;
 String str;
 #define SS_PIN 53
 #define RST_PIN 5
+//Instance of classes
 MFRC522 rfid(SS_PIN, RST_PIN);
 MFRC522::MIFARE_Key key;
 SoftwareSerial serial(2,3);
 BBot myRobot(serial, RFIDProgramming);
+
 void RFID(){
   if (!rfid.PICC_IsNewCardPresent() || !rfid.PICC_ReadCardSerial()) { return; }
   int cardId = rfid.uid.uidByte[0] + rfid.uid.uidByte[1] + rfid.uid.uidByte[2] + rfid.uid.uidByte[3];
   myRobot.RFID(cardId);
   rfid.PICC_HaltA();
   rfid.PCD_StopCrypto1();
+}
+
+void serialEvent(){
+  while(Serial.available()) {
+    str = Serial.readString();
+    String operation = myRobot.getValueFromString(str, ':', 0);
+    String action = operation.substring(0);
+    if(action == "S"){
+      myRobot.ResetEveryThing();
+      myRobot.isActive = true;
+    }else if(action == "P"){
+      myRobot.isActive = false;
+    }
+  }
 }
 
 void setup() {
@@ -41,6 +57,7 @@ void setup() {
 }
 
 void loop(){
+  //@startContainer
   if(myRobot.isActive){
     RFID();
     myRobot.IRs();
@@ -49,21 +66,6 @@ void loop(){
   }
   myRobot.movement();
   delay(10);
-  //@startContainer
   //@newContent
   //@endContainer
-}
-
-void serialEvent(){
-  while(Serial.available()) {
-    str = Serial.readString();
-    String operation = myRobot.getValueFromString(str, ':', 0);
-    String action = operation.substring(0);
-    if(action == "S"){
-      myRobot.ResetEveryThing();
-      myRobot.isActive = true;
-    }else if(action == "P"){
-      myRobot.isActive = false;
-    }
-  }
 }

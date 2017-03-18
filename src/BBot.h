@@ -110,7 +110,7 @@ enum Action{
   @params:
     when an instance object created
     a reference of SoftwareSerial (NOT HardwareSerial!)
-    object should be send.
+    object should be send in addition to the mode needed.
 */
 class BBot{
   public:
@@ -237,7 +237,7 @@ class BBot{
     /**
       RFID function:
       @params:
-      cardId: the sum of the read card's bits
+      cardId: the sum of the read card's bytes
       @return:
       void
       ----------
@@ -352,7 +352,7 @@ class BBot{
     int _motorA1, _motorA2, _motorB1, _motorB2;
     int _IR1, _IR2, _IR3;
     int _a, _b, _c, _d, _e, _f, _g; //seven segment
-    int _trig, _echo;
+    int _trig, _echo; //ULTRASONIC
     int _greenLED, _redLED, _buzzer;
     /*
       _velocityLeftMotor and _velocityRightMotor: used after applying mathematical equation in movement(_)

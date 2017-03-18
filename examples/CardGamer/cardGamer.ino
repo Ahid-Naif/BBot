@@ -4,7 +4,7 @@
 #include <BBot.h>
 #include <string.h>
 int leftIR = 37, middleIR = 38, rightIR = 39;
-int motorA1 = 9, motorA2 = 8, motorB1 = 11, motorB2 = 10;
+int motorA1 = 9, motorA2 = 8, motorB1 = 10, motorB2 = 11;
 int redLED = 2, greenLED = 3, buzzer= 4;
 int a = 46, b = 47, c = 43, d = 45, e = 44, f = 49, g = 48;
 int trig = 6, echo = 7;
