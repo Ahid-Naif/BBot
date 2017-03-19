@@ -66,14 +66,21 @@ forward = 604
   A: swetch to autonomous mode(LineFollowing)
   L: you lost
   W: you win
+  G: set the needed goal mode
 */
 
 #ifndef BBot_h
 #define BBot_h
 
 #include <Arduino.h>
+#include <MFRC522.h>
 #include <SoftwareSerial.h>
 #include "config/global.h"
+#include <iostream>
+#include <map>
+
+using namespace std;
+
 /**
   ## Available Modes:
   ------------------
@@ -105,26 +112,15 @@ enum Action{
   SpeedUp,
   SlowDown
 };
-/**
-  BBot main Class (constructor)
-  @params:
-    when an instance object created
-    a reference of SoftwareSerial (NOT HardwareSerial!)
-    object should be send in addition to the mode needed.
-*/
+
 class BBot{
   public:
-    BBot(SoftwareSerial& serial, Mode mode);
     /**
-      ResetEveryThing function:
+      BBot main Class (constructor)
       @params:
-      void
-      @return:
-      void
-      ----------
-      Turns off all LEDs, reset currentCardId to zero and it call setNumberOnSevenSegment(-1) to clear 7-segment output.
+        when an instance object created a reference of MFRC522 object should be send.
     */
-    void ResetEveryThing(void);
+    BBot(MFRC522& rfid);
     /**
       setMode function:
       @params:
@@ -237,7 +233,7 @@ class BBot{
     /**
       RFID function:
       @params:
-      cardId: the sum of the read card's bytes
+      void
       @return:
       void
       ----------
@@ -245,7 +241,7 @@ class BBot{
       where IRs(_) function will perform line following and whenever the robot read new RFID card the RFID(_)
       will be activiated and it will perform the command assigned with the card.
     */
-    void RFID(int cardId);
+    void RFID();
     /**
       linkCurrentCardWithAction function:
       @params:
@@ -311,6 +307,16 @@ class BBot{
     */
     float distanceFromUltrasonic();
     /**
+      ResetEveryThing function:
+      @params:
+      void
+      @return:
+      void
+      ----------
+      Turns off all LEDs, reset currentCardId to zero and it call setNumberOnSevenSegment(-1) to clear 7-segment output.
+    */
+    void ResetEveryThing(void);
+    /**
       getValueFromString function:
       @params:
       data: string needed to be splitted.
@@ -331,6 +337,9 @@ class BBot{
       deactivate the movement for some seconds.
     */
     bool isActive;
+
+    void performActionWithSerial(String str);
+    void prepareForMovement(void);
   private:
     /**
       stopForever function:
@@ -342,12 +351,10 @@ class BBot{
       stop every thing in the robot.
     */
     void stopForever(void);
-    bool isRegisteredIn(int cardId, String action);
     /**
-      _serial: the reference of the initialized object from SoftwareSerial class,
-      used in the communication between the app and the robot.
+
     */
-    SoftwareSerial& _serial;
+    MFRC522& _rfid;
     /** other useful private variables **/
     int _motorA1, _motorA2, _motorB1, _motorB2;
     int _IR1, _IR2, _IR3;
@@ -363,9 +370,7 @@ class BBot{
       numberOfCardCanBeRead: used to count how many cards left can be read before losing the match in RFID1 and RFID2.
     */
     int numberOfCardCanBeRead;
-    int rightCards[10];
-    int leftCards[10];
-    int stopCard;
+    Map<int, String> cards;
     /*
       the differance between mode and goalMode is that mode can be changed
       according to the need anytime but goalMode cannot be changed while the
@@ -373,7 +378,7 @@ class BBot{
     */
     Mode mode, goalMode;
     /*
-      action variable used in RFID operation where it can be changed according 
+      action variable used in RFID operation where it can be changed according
       to the action read on the card.
     */
     Action action;

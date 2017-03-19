@@ -47,20 +47,18 @@ const struct {
 } constants;
 
 // Public methods
-BBot::BBot(SoftwareSerial& serial, Mode mode): _serial(serial){
-  this->_serial = serial;
+BBot::BBot(MFRC522& rfid): _rfid(rfid){
+  this->_rfid = rfid;
   this->_angularVelocity = 0;
   this->_linearVelocity = 0;
-  this->goalMode = mode;
   this->numberOfCardCanBeRead = 9;
   this->currentCardId = 0;
   this->doneSetup = false;
-  this->rightCards[10] = {0};
-  this->leftCards[10] = {0};
 }
 
 void BBot::ResetEveryThing(){
   this->numberOfCardCanBeRead = 9;
+  this->cards.clear();
   this->currentCardId = 0;
   this->setNumberOnSevenSegment(-1);
   dw(this->_buzzer,0);
@@ -117,30 +115,24 @@ void BBot::IRs(){
   int leftIR = digitalRead(this->_IR1);
   int middleIR = digitalRead(this->_IR2);
   int rightIR = digitalRead(this->_IR3);
-  if( //forward
-    ( leftIR && !middleIR && rightIR )
-    ||
-    ( !leftIR && middleIR && !rightIR )
-    ||
-    ( leftIR && middleIR && rightIR )
-  ){
+  if(( leftIR && !middleIR && rightIR ) || ( !leftIR && middleIR && !rightIR ) || ( leftIR && middleIR && rightIR ) ){ //forward
     this->_linearVelocity = constants.v_move;
     this->_angularVelocity = 0;
-  }else if( (leftIR == 1) && (middleIR == 1) && (rightIR == 0) ){ //Left
+  }else if(leftIR && middleIR && !rightIR){ //Left
     this->_linearVelocity = constants.v_move/2;
     this->_angularVelocity = constants.w_turn;
-  }else if( (leftIR == 1) && (middleIR == 0) && (rightIR == 0) ){ //SharpLeft
-    lastStateOfLineFollowing = 1; //SharpLeft
+  }else if(leftIR && !middleIR && !rightIR){ //SharpLeft
+    lastStateOfLineFollowing = 1;
     this->_linearVelocity = 0;
     this->_angularVelocity = constants.w_sharpTurn;
-  }else if( (leftIR == 0) && (middleIR == 1) && (rightIR == 1) ){ //Right
+  }else if(!leftIR && middleIR && rightIR){ //Right
     this->_linearVelocity = constants.v_move/2;
     this->_angularVelocity = -constants.w_turn;
-  }else if( (leftIR == 0) && (middleIR == 0) && (rightIR == 1) ){ //SharpRight
-    lastStateOfLineFollowing = 2; //SharpRight
+  }else if(!leftIR && !middleIR && rightIR){ //SharpRight
+    lastStateOfLineFollowing = 2;
     this->_linearVelocity = 0;
     this->_angularVelocity = -constants.w_sharpTurn;
-  }else if( !leftIR && !middleIR && !rightIR ){
+  }else if(!leftIR && !middleIR && !rightIR){ //if lost refere back to the prev. status
     if(lastStateOfLineFollowing == 1){
       this->_linearVelocity = constants.w_sharpTurn/2;
       this->_angularVelocity = constants.w_sharpTurn/2;
@@ -151,8 +143,12 @@ void BBot::IRs(){
   }
 }
 
-void BBot::RFID(int cardId){
+void BBot::RFID(){
   if(!this->isActive){ return; }
+  if (!this->_rfid.PICC_IsNewCardPresent() || !this->_rfid.PICC_ReadCardSerial()) { return; }
+  int cardId = this->_rfid.uid.uidByte[0] + this->_rfid.uid.uidByte[1] + this->_rfid.uid.uidByte[2] + this->_rfid.uid.uidByte[3];
+  this->_rfid.PICC_HaltA();
+  this->_rfid.PCD_StopCrypto1();
   int numberOfPulses = 1;
   if(this->goalMode == RFID1 && this->mode == LineFollowing){
     this->mode = RFID1;
@@ -197,14 +193,14 @@ void BBot::RFID(int cardId){
     }else if(this->mode == LineFollowing && this->doneSetup == true){ //run as RFID1
       //add to the list
       this->mode = RFID2;
-      if(cardId == this->stopCard){
+      if(this->cards[cardId] == "S"){
         Serial.print("F");
         this->isActive = false;
         numberOfPulses = 3;
-      }else if( this->isRegisteredIn(cardId, "Right") ){
+      }else if(this->cards[cardId] == "R"){
         this->action = Right;
         Serial.print("C1");
-      }else if( this->isRegisteredIn(cardId, "Left") ){
+      }else if(this->cards[cardId] == "L"){
         this->action = Left;
         Serial.print("C1");
       }else if( cardId == 763){
@@ -212,8 +208,6 @@ void BBot::RFID(int cardId){
         Serial.print("C1");
       }else if( cardId == 271){
         //this->action = SlowDown;
-        Serial.print("C1");
-      }else{
         Serial.print("C1");
       }
       for (int i = 0; i < numberOfPulses; i++) {
@@ -240,30 +234,10 @@ void BBot::RFID(int cardId){
 
 void BBot::linkCurrentCardWithAction(String cardAction){
   this->isActive = true;
-  if(cardAction == "R"){
-    for (int i = 0; i < 10; i++) {
-      if(this->rightCards[i] == 0){
-        this->rightCards[i] = this->currentCardId;
-        break;
-      }
-    }
-  }else if(cardAction == "L"){
-    for (int i = 0; i < 10; i++) {
-      if(this->leftCards[i] == 0){
-        this->leftCards[i] = this->currentCardId;
-        break;
-      }
-    }
-  }else if(cardAction == "S"){
-    this->stopCard = this->currentCardId;
+  this->cards[this->currentCardId] = cardAction;
+  if(cardAction == "S"){
     this->doneSetup = true;
     this->isActive = false;
-  }else if(cardAction == "F"){ //forward
-
-  }else if(cardAction == "SU"){ //speed up
-
-  }else if(cardAction == "SL"){ //slow down
-
   }
 }
 
@@ -276,106 +250,29 @@ bool BBot::countOnSevenSegment(int from, int to, int delayDuration){
 }
 
 void BBot::setNumberOnSevenSegment(int number){
-  switch (number) {
+  switch (number){
     case 0:
-    dw(this->_a, 0);
-    dw(this->_b, 0);
-    dw(this->_c, 0);
-    dw(this->_d, 0);
-    dw(this->_e, 0);
-    dw(this->_f, 0);
-    dw(this->_g, 1);
-    break;
+      dw(this->_a, 0); dw(this->_b, 0); dw(this->_c, 0); dw(this->_d, 0); dw(this->_e, 0); dw(this->_f, 0); dw(this->_g, 1); break;
     case 1:
-    dw(this->_a, 1);
-    dw(this->_b, 0);
-    dw(this->_c, 0);
-    dw(this->_d, 1);
-    dw(this->_e, 1);
-    dw(this->_f, 1);
-    dw(this->_g, 1);
-    break;
+      dw(this->_a, 1); dw(this->_b, 0); dw(this->_c, 0); dw(this->_d, 1); dw(this->_e, 1); dw(this->_f, 1); dw(this->_g, 1); break;
     case 2:
-    dw(this->_a, 0);
-    dw(this->_b, 0);
-    dw(this->_c, 1);
-    dw(this->_d, 0);
-    dw(this->_e, 0);
-    dw(this->_f, 1);
-    dw(this->_g, 0);
-    break;
+      dw(this->_a, 0); dw(this->_b, 0); dw(this->_c, 1); dw(this->_d, 0); dw(this->_e, 0); dw(this->_f, 1); dw(this->_g, 0); break;
     case 3:
-    dw(this->_a, 0);
-    dw(this->_b, 0);
-    dw(this->_c, 0);
-    dw(this->_d, 0);
-    dw(this->_e, 1);
-    dw(this->_f, 1);
-    dw(this->_g, 0);
-    break;
+      dw(this->_a, 0); dw(this->_b, 0); dw(this->_c, 0); dw(this->_d, 0); dw(this->_e, 1); dw(this->_f, 1); dw(this->_g, 0); break;
     case 4:
-    dw(this->_a, 1);
-    dw(this->_b, 0);
-    dw(this->_c, 0);
-    dw(this->_d, 1);
-    dw(this->_e, 1);
-    dw(this->_f, 0);
-    dw(this->_g, 0);
-    break;
+      dw(this->_a, 1); dw(this->_b, 0); dw(this->_c, 0); dw(this->_d, 1); dw(this->_e, 1); dw(this->_f, 0); dw(this->_g, 0); break;
     case 5:
-    dw(this->_a, 0);
-    dw(this->_b, 1);
-    dw(this->_c, 0);
-    dw(this->_d, 0);
-    dw(this->_e, 1);
-    dw(this->_f, 0);
-    dw(this->_g, 0);
-    break;
+      dw(this->_a, 0); dw(this->_b, 1); dw(this->_c, 0); dw(this->_d, 0); dw(this->_e, 1); dw(this->_f, 0); dw(this->_g, 0); break;
     case 6:
-    dw(this->_a, 0);
-    dw(this->_b, 1);
-    dw(this->_c, 0);
-    dw(this->_d, 0);
-    dw(this->_e, 0);
-    dw(this->_f, 0);
-    dw(this->_g, 0);
-    break;
+      dw(this->_a, 0); dw(this->_b, 1); dw(this->_c, 0); dw(this->_d, 0); dw(this->_e, 0); dw(this->_f, 0); dw(this->_g, 0); break;
     case 7:
-    dw(this->_a, 0);
-    dw(this->_b, 0);
-    dw(this->_c, 0);
-    dw(this->_d, 1);
-    dw(this->_e, 1);
-    dw(this->_f, 1);
-    dw(this->_g, 1);
-    break;
+      dw(this->_a, 0); dw(this->_b, 0); dw(this->_c, 0); dw(this->_d, 1); dw(this->_e, 1); dw(this->_f, 1); dw(this->_g, 1); break;
     case 8:
-    dw(this->_a, 0);
-    dw(this->_b, 0);
-    dw(this->_c, 0);
-    dw(this->_d, 0);
-    dw(this->_e, 0);
-    dw(this->_f, 0);
-    dw(this->_g, 0);
-    break;
+      dw(this->_a, 0); dw(this->_b, 0); dw(this->_c, 0); dw(this->_d, 0); dw(this->_e, 0); dw(this->_f, 0); dw(this->_g, 0); break;
     case 9:
-    dw(this->_a, 0);
-    dw(this->_b, 0);
-    dw(this->_c, 0);
-    dw(this->_d, 0);
-    dw(this->_e, 1);
-    dw(this->_f, 0);
-    dw(this->_g, 0);
-    break;
+      dw(this->_a, 0); dw(this->_b, 0); dw(this->_c, 0); dw(this->_d, 0); dw(this->_e, 1); dw(this->_f, 0); dw(this->_g, 0); break;
     case -1:
-    dw(this->_a, 1);
-    dw(this->_b, 1);
-    dw(this->_c, 1);
-    dw(this->_d, 1);
-    dw(this->_e, 1);
-    dw(this->_f, 1);
-    dw(this->_g, 1);
-    break;
+      dw(this->_a, 1); dw(this->_b, 1); dw(this->_c, 1); dw(this->_d, 1); dw(this->_e, 1); dw(this->_f, 1); dw(this->_g, 1); break;
   }
 }
 
@@ -387,52 +284,53 @@ void BBot::teleoperation(int xAxis, int yAxis){
 }
 
 void BBot::movement(){
-  if((this->mode == RFID1 || this->mode == RFID2) && this->isActive){
-    switch (this->action) {
-      case Right:
-      this->teleoperation(0,-30);
-      if(
-        (!dr(this->_IR1) && !dr(this->_IR2) && dr(this->_IR3))
-        ||
-        (!dr(this->_IR1) && dr(this->_IR2) && dr(this->_IR3))
-      ){
-        this->mode = LineFollowing;
+  if(this->isActive){
+    if(this->mode == RFID1 || this->mode == RFID2){
+      switch (this->action) {
+        case Right:
+        this->teleoperation(0,-30);
+        if((!dr(this->_IR1) && !dr(this->_IR2) && dr(this->_IR3)) || (!dr(this->_IR1) && dr(this->_IR2) && dr(this->_IR3))){
+          this->mode = LineFollowing;
+        }
+        break;
+        case Left:
+        this->teleoperation(0,30);
+        if(
+          (dr(this->_IR1) && !dr(this->_IR2) && !dr(this->_IR3))
+          ||
+          (dr(this->_IR1) && dr(this->_IR2) && !dr(this->_IR3))
+        ){
+          this->mode = LineFollowing;
+        }
+        break;
+        case SpeedUp:
+          this->mode = LineFollowing;
+        break;
+        case SlowDown:
+          this->mode = LineFollowing;
+        break;
       }
-      break;
-      case Left:
-      this->teleoperation(0,30);
-      if(
-        (dr(this->_IR1) && !dr(this->_IR2) && !dr(this->_IR3))
-        ||
-        (dr(this->_IR1) && dr(this->_IR2) && !dr(this->_IR3))
-      ){
-        this->mode = LineFollowing;
-      }
-      break;
-      case SpeedUp:
-        this->mode = LineFollowing;
-      break;
-      case SlowDown:
-        this->mode = LineFollowing;
-      break;
     }
+  }else{
+    this->teleoperation(0,0);
   }
   this->_velocityRightMotor = constrain((this->_linearVelocity - constants.b * this->_angularVelocity),-255,255);
   this->_velocityLeftMotor = constrain((this->_linearVelocity + constants.b * this->_angularVelocity),-255,255);
   if(this->_velocityRightMotor<0){
-      analogWrite(this->_motorA1,abs(this->_velocityRightMotor));
+      analogWrite(this->_motorA1,this->_velocityRightMotor * -1);
       analogWrite(this->_motorA2,0);
   }else{
       analogWrite(this->_motorA1,0);
       analogWrite(this->_motorA2,this->_velocityRightMotor);
   }
   if(this->_velocityLeftMotor<0){
-      analogWrite(this->_motorB1,abs(this->_velocityLeftMotor));
+      analogWrite(this->_motorB1, this->_velocityLeftMotor * -1);
       analogWrite(this->_motorB2,0);
   }else{
       analogWrite(this->_motorB1,0);
       analogWrite(this->_motorB2,this->_velocityLeftMotor);
   }
+  delay(10);
 }
 
 float BBot::distanceFromUltrasonic(){
@@ -464,20 +362,49 @@ void BBot::stopForever(){//need to be updated later
   this->isActive = false;
 }
 
-bool BBot::isRegisteredIn(int cardId, String action){
-  bool found = false;
-  for(int i =0 ; i < 10; i++){
-    if(action == "Right"){
-      if(this->rightCards[i] == cardId){
-        found = true;
-        break;
-      }
-    }else if(action == "Left"){
-      if(this->leftCards[i] == cardId){
-        found = true;
-        break;
-      }
+void BBot::performActionWithSerial(String str){
+  String operation = this->getValueFromString(str, ':', 0);
+  String action = operation.substring(0);
+  if(action == "G"){ //goal mode
+    String mode = this->getValueFromString(str, ':', 1);
+    if(mode == "1"){
+      this->goalMode = Teleoperation;
+      this->mode = Teleoperation;
+    }else if(mode == "2"){
+      this->goalMode = RFID1;
+      this->mode = LineFollowing;
+    }else if(mode == "3"){
+      this->goalMode = RFID2;
+      this->mode = LineFollowing;
+    }else if(mode == "4"){
+      this->goalMode = RFIDProgramming;
+      this->mode = LineFollowing;
+    }
+  }else if(action == "S"  || action == "SS"){ //start
+    if (action == "SS") this->ResetEveryThing();
+    this->isActive = true;
+  }else if(action == "P"){ //pause
+    this->isActive = false;
+  }else if(action == "V"){
+    this->teleoperation(this->getValueFromString(str, ':', 1).toInt(), this->getValueFromString(str, ':', 2).toInt());
+  }else if(action == "T"){
+    this->mode = Teleoperation;
+  }else if(action == "A"){
+    this->mode = LineFollowing;
+  }else if(action == "FS"){
+    this->isActive = false;
+  }else if(action == "L"){
+    String cardAction = this->getValueFromString(str, ':', 1);
+    this->linkCurrentCardWithAction(cardAction);
+  }
+}
+
+void BBot::prepareForMovement(void){
+  if(this->goalMode != Teleoperation){ this->RFID(); this->IRs(); return; }
+  if(this->isActive){
+    if(this->distanceFromUltrasonic() > 40){
+      this->isActive = !this->isActive;
+      Serial.print("F");
     }
   }
-  return found;
 }

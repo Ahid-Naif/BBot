@@ -3,6 +3,7 @@
 #include <SPI.h>
 #include <BBot.h>
 #include <string.h>
+
 int leftIR = 37, middleIR = 38, rightIR = 39;
 int motorA1 = 9, motorA2 = 8, motorB1 = 10, motorB2 = 11;
 int redLED = 2, greenLED = 3, buzzer= 4;
@@ -11,11 +12,11 @@ int trig = 6, echo = 7;
 String str;
 #define SS_PIN 53
 #define RST_PIN 5
-//Instance of classes
+
 MFRC522 rfid(SS_PIN, RST_PIN);
 MFRC522::MIFARE_Key key;
 SoftwareSerial serial(2,3);
-BBot myRobot(serial, RFID1);
+BBot myRobot(serial);
 
 void RFID(){
   if (!rfid.PICC_IsNewCardPresent() || !rfid.PICC_ReadCardSerial()) { return; }
@@ -28,20 +29,7 @@ void RFID(){
 void serialEvent(){
   while(Serial.available()) {
     str = Serial.readString();
-    String operation = myRobot.getValueFromString(str, ':', 0);
-    String action = operation.substring(0);
-    if(action == "S"){
-      myRobot.ResetEveryThing();
-      myRobot.isActive = true;
-    }else if(action == "P"){
-      myRobot.isActive = false;
-    }else if(action == "T"){
-      myRobot.setMode(Teleoperation);
-    }else if(action == "A"){
-      myRobot.setMode(LineFollowing);
-    }else if(action == "V"){
-      myRobot.teleoperation(myRobot.getValueFromString(str, ':', 1).toInt(),myRobot.getValueFromString(str, ':', 2).toInt());
-    }
+    myRobot.performActionWithSerial(str);
   }
 }
 
@@ -63,12 +51,9 @@ void setup() {
 }
 
 void loop(){
-  if(myRobot.isActive){
-    RFID();
-    myRobot.IRs();
-  }else{
-    myRobot.teleoperation(0,0);
-  }
+  //@startContainer
+  myRobot.prepareForMovement();
   myRobot.movement();
-  delay(10);
+  //@newContent
+  //@endContainer
 }
