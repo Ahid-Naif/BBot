@@ -240,7 +240,7 @@ void BBot::RFID(){
     if(cardId == 255) // 255 is just an example, cardId for card A
       this->logicalCards["A"] = 1;
     else if(cardId == 225) // cardId for card B
-      this->logicalCards["B"] = 1
+      this->logicalCards["B"] = 1;
       /* -------------------------- */
     if(this->and_or == "A"){
       if( (this->logicalCards["A"] == 1) && (this->logicalCards["B"] == 1) ){
@@ -428,11 +428,12 @@ void BBot::performActionWithSerial(String str){
     String cardAction = this->getValueFromString(str, ':', 1);
     this->linkCurrentCardWithAction(cardAction);
   }else if(action == "I"){
-    this->iterations = this->getValueFromString(str, ':', 2).toInt();
+    this->iterations = this->getValueFromString(str, ':', 1).toInt();
     this->numberRounds = 0;
   }else if(action == "O"){
-    this->logicalCards["A"] = 0, this->logicalCards["B"] = 0;
-    this->and_or = this->getValueFromString(str, ":", 2);
+    this->logicalCards["A"] = 0;
+    this->logicalCards["B"] = 0;
+    this->and_or = this->getValueFromString(str, ':', 1);
   }
 }
 
