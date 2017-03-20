@@ -368,7 +368,9 @@ class BBot{
       function where this values will assigned to the left and right motors respectively.
     */
     double _linearVelocity, _angularVelocity, _velocityLeftMotor, _velocityRightMotor;
-    int iterations; // to read the number of rounds for the "Repeat Task" Loop Mode
+    int iterations; // to specifies the maximum number of rounds for  "Loop" Mode
+    int numberRounds; // it represents the current round number
+    String and_or; // its value is either A which stands for "and", or O which stands for "or"
     /*
       numberOfCardCanBeRead: used to count how many cards left can be read before losing the match in RFID1 and RFID2.
     */

@@ -8,7 +8,7 @@
   ========================
   The B-Bot aims to provide a useful complementary tool for STEM education through robotics.
   The invention resides broadly in a flexible and modular robot that can be built by children
-  using the different parts that are provided with the kit. It is an adaptable p latform that
+  using the different parts that are provided with the kit. It is an adaptable platform that
   takes into consideration the age and learning capabilities of a child. The robot also comes
   with a wide range of sensors, actuators and a graphical programming softwares to program the robot.
   The B-Bot aims at providing an engaging complementary tool to the current methods of
@@ -229,26 +229,26 @@ void BBot::RFID(){
       this->isActive = false;
     }
     Serial.print(cardId);
-  }else if(this->goalMode == loop && this->mode == LineFollowing){
+  }else if( (this->goalMode == Loop) && (this->mode == LineFollowing) ){
     if(cardId == 255)
-      numberRounds++;
-    if(numberRounds == iterations){
+      this->numberRounds++;
+    if(this->numberRounds == this->iterations){
       this->isActive = false;
       Serial.print("F");
     }
-  }else if(this->goalMode == logic && this->mode == LineFollowing){
+  }else if( (this->goalMode == Logic) && (this->mode == LineFollowing) ){
     if(cardId == 255) // 255 is just an example, cardId for card A
-      logicalCards["A"] = 1;
+      this->logicalCards["A"] = 1;
     else if(cardId == 225) // cardId for card B
-      logicalCards["B"] = 1
+      this->logicalCards["B"] = 1
       /* -------------------------- */
-    if(and_or == "A"){
-      if( (logicalCards["A"] == 1) && (logicalCards["B"] == 1) ){
+    if(this->and_or == "A"){
+      if( (this->logicalCards["A"] == 1) && (this->logicalCards["B"] == 1) ){
         this->isActive = false;
         Serial.print("F");
       }
-    }else if(and_or == "B"){
-      if( (logicalCards["A"] == 1) || (logicalCards["B"] == 1)){
+    }else if(this->and_or == "B"){
+      if( (this->logicalCards["A"] == 1) || (this->logicalCards["B"] == 1) ){
         this->isActive = false;
         Serial.print("F");
       }
@@ -428,11 +428,11 @@ void BBot::performActionWithSerial(String str){
     String cardAction = this->getValueFromString(str, ':', 1);
     this->linkCurrentCardWithAction(cardAction);
   }else if(action == "I"){
-    iterations = this->getValueFromString(str, ':', 2).toInt();
-    int numberRounds = 0;
+    this->iterations = this->getValueFromString(str, ':', 2).toInt();
+    this->numberRounds = 0;
   }else if(action == "O"){
-    logicalCards["A"] = 0 logicalCards["B"] = 0;
-    String and_or = this->getValueFromString(str, ":", 2);
+    this->logicalCards["A"] = 0, this->logicalCards["B"] = 0;
+    this->and_or = this->getValueFromString(str, ":", 2);
   }
 }
 
