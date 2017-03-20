@@ -91,11 +91,13 @@ using namespace std;
   5. Pure line-following
 */
 enum Mode {
-  Teleoperation,
-  RFID1,
-  RFID2,
-  RFIDProgramming,
-  LineFollowing
+  Teleoperation, //1
+  RFID1, //2
+  RFID2, //3
+  RFIDProgramming, //4
+  LineFollowing,
+  Logic, //5
+  Loop //6
 };
 /**
   ## Available Actions [needed with RFID 1 & RFID 2]
