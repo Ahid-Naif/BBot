@@ -229,17 +229,17 @@ void BBot::RFID(){
       this->isActive = false;
     }
     Serial.print(cardId);
-  }else if( (this->goalMode == Loop) && (this->mode == LineFollowing) ){
-    if(cardId == 255)
+  }else if(this->goalMode == Loop){
+    if(cardId == 422)
       this->numberRounds++;
     if(this->numberRounds == this->iterations){
       this->isActive = false;
       Serial.print("F");
     }
-  }else if( (this->goalMode == Logic) && (this->mode == LineFollowing) ){
-    if(cardId == 255) // 255 is just an example, cardId for card A
+  }else if(this->goalMode == Logic){
+    if(cardId == 422)
       this->logicalCards["A"] = 1;
-    else if(cardId == 225) // cardId for card B
+    else if(cardId == 342) // cardId for card B
       this->logicalCards["B"] = 1;
       /* -------------------------- */
     if(this->and_or == "A"){
@@ -247,13 +247,12 @@ void BBot::RFID(){
         this->isActive = false;
         Serial.print("F");
       }
-    }else if(this->and_or == "B"){
+    }else if(this->and_or == "O"){
       if( (this->logicalCards["A"] == 1) || (this->logicalCards["B"] == 1) ){
         this->isActive = false;
         Serial.print("F");
       }
     }
-
   }
 }
 
