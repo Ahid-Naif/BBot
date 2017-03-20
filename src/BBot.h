@@ -368,11 +368,13 @@ class BBot{
       function where this values will assigned to the left and right motors respectively.
     */
     double _linearVelocity, _angularVelocity, _velocityLeftMotor, _velocityRightMotor;
+    int iterations; // to read the number of rounds for the "Repeat Task" Loop Mode
     /*
       numberOfCardCanBeRead: used to count how many cards left can be read before losing the match in RFID1 and RFID2.
     */
     int numberOfCardCanBeRead;
     Map<int, String> cards;
+    Map<string, int> logicalCards; // this map is to read the cards of the "Logic" Mode
     /*
       the differance between mode and goalMode is that mode can be changed
       according to the need anytime but goalMode cannot be changed while the
