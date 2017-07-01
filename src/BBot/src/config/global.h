@@ -1,7 +1,7 @@
 #ifndef global_h
 #define global_h
 //shortcut for Serial.print() >> now use p() only
-#define p(str) Serial.print(str)
+#define pr(str) Serial.print(str)
 //shortcut for Serial.println() >> now use pln() only
 #define pln(str) Serial.println(str)
 #define dw(pin,state) digitalWrite(pin,state)

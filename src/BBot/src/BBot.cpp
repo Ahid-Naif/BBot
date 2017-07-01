@@ -230,13 +230,14 @@ void BBot::RFID(){
     }
     Serial.print(cardId);
   }else if(this->goalMode == Loop){
-    if(cardId == 422){
+    if(cardId == 342){
       this->numberRounds++;
-      Serial.print("C1");
     }
     if(this->numberRounds == this->iterations){
       this->isActive = false;
       Serial.print("F");
+    }else{
+      Serial.print("C1");
     }
   }else if(this->goalMode == Logic){
     if(cardId == 422)
