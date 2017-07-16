@@ -76,6 +76,7 @@ forward = 604
 #define BBot_h
 
 #include <Arduino.h>
+#include <SPI.h>
 #include <MFRC522.h>
 #include <SoftwareSerial.h>
 #include "config/global.h"

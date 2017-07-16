@@ -48,7 +48,7 @@ const struct {
 
 // Public methods
 BBot::BBot(MFRC522& rfid): _rfid(rfid){
-  this->_rfid = rfid;
+  // this->_rfid = rfid;
   this->_angularVelocity = 0;
   this->_linearVelocity = 0;
   this->numberOfCardCanBeRead = 9;

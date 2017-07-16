@@ -4,7 +4,7 @@
 #include <BBot.h>
 #include <string.h>
 
-int motorA1 = 2, motorA2 = 3, motorB1 = 4, motorB2 = 5;
+int motorA1 = 2, motorA2 = 3, motorB1 = 8, motorB2 = 9;
 
 String str;
 #define SS_PIN 53
