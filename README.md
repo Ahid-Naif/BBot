@@ -1,9 +1,9 @@
-#Rachis Systems Sdn. Bhd.
+# Rachis Systems Sdn. Bhd.
 
 
-##R&D Department
+## R&D Department
 
->###B-Bot
+>### B-Bot
 
 The B-Bot aims to provide a useful complementary tool for STEM education through robotics. <br>
 The invention resides broadly in a flexible and modular robot that can be built by children
