@@ -16,7 +16,7 @@ Science, Technology, Engineering and Mathematics.
 
 B-Bot Library:
 * website: https://rachissystems.com/our-products/bbot
-* github: https://github.com/RachisSystems/B-Bot
+* github: https://github.com/RachisSystems/BBot
 
 >Important Note:
 
