@@ -15,7 +15,7 @@ learning by providing students with a hands-on learning experience in the field 
 Science, Technology, Engineering and Mathematics.
 
 B-Bot Library:
-* website: https://www.rachissystems.com/B-Bot
+* website: https://rachissystems.com/our-products/bbot
 * github: https://github.com/RachisSystems/B-Bot
 
 >Important Note:
