@@ -80,7 +80,6 @@ forward = 604
 #include <MFRC522.h>
 #include <SoftwareSerial.h>
 #include "config/global.h"
-#include "Timer/Timer.h"
 #include <iostream>
 #include <map>
 
@@ -358,15 +357,15 @@ class BBot{
 
     void performActionWithSerial(String str);
     void prepareForMovement(void);
-
     /*
-      Timer
-      Object timer to check ultrasonic status
-      counter
+
+
     */
-    Timer timer;
-    int balloonCounter;
-    void balloonCounterIncrement();
+    void timerCallback(void);
+    /*
+
+    */
+    bool isTimerNeeded(void);
 
   private:
     /**
@@ -424,13 +423,19 @@ class BBot{
     */
     int currentCardId;
     /*
+
+    */
+    int _timerThreshold = 5;
+    /*
+
+    */
+    int _balloonCounter = 0;
+    /*
       a boolean indicator used in RFID2 where its value changed to true when the
       command sent from the app telling it that the setup for the cards is done
       and ready to play the game on the programmed command on each card.
     */
     bool doneSetup;
-
-
 };
 
 #endif
