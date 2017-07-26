@@ -98,9 +98,14 @@ void BBot::setupSevenSegment(int a, int b, int c, int d, int e, int f, int g){
   this->setNumberOnSevenSegment(-1);
 }
 
-void BBot::setupUltrasonic(int trig, int echo){
-  this->_trig = trig;
-  this->_echo = echo;
+void BBot::setupUltrasonic(int trigUp, int echoUp, int trigRight, int echoRight,int trigLeft, int echoLeft){
+  this->_trigUp = trigUp;
+  this->_echoUp = echoUp;
+  this->_trigRight = trigRight;
+  this->_echoRight = echoRight;
+  this->_trigLeft = trigLeft;
+  this->_echoLeft = echoLeft;
+
 }
 
 void BBot::setupCircuitComponents(int redLED, int greenLED, int buzzer){
@@ -360,14 +365,27 @@ void BBot::movement(){
   delay(10);
 }
 
-float BBot::distanceFromUltrasonic(){
-  digitalWrite(this->_trig,LOW);
-  delayMicroseconds(2);
-  digitalWrite(this->_trig,HIGH);
-  delayMicroseconds(7);
-  digitalWrite(this->_trig,LOW);
-  float time = pulseIn(this->_echo,HIGH);
-  return time / 58;
+float BBot::distanceFromUltrasonic(Ultrasonics ultrasonics){
+  int echo, trig;
+  this->ultrasonics = ultrasonics;
+  if(this->ultrasonics == ultraTop){
+        echo = this->_echoUp;
+        trig = this->_trigUp;
+    }else if(this->ultrasonics == ultraRight){
+        echo = this->_echoRight;
+        trig = this->_trigRight;
+    }else if(this->ultrasonics == ultraLeft){
+        echo = this->_echoLeft;
+        trig = this->_trigLeft;
+    }
+
+    digitalWrite(trig,LOW);
+    delayMicroseconds(2);
+    digitalWrite(trig,HIGH);
+    delayMicroseconds(7);
+    digitalWrite(trig,LOW);
+    float time = pulseIn(echo,HIGH);
+    return time / 58;
 }
 
 String BBot::getValueFromString(String data, char separator, int index){
@@ -397,7 +415,7 @@ void BBot::performActionWithSerial(String str){
     if(mode == "1"){
       this->goalMode = Teleoperation;
       this->mode = Teleoperation;
-    }else if(mode == "2"){
+    }else if(mode == "7"){
       this->goalMode = RFID1;
       this->mode = LineFollowing;
     }else if(mode == "3"){
@@ -412,6 +430,9 @@ void BBot::performActionWithSerial(String str){
     }else if(mode == "6"){
       this->goalMode = Loop;
       this->mode = LineFollowing;
+    }else if(mode == "2"){
+      this->goalMode = ObstacleAvoidance;
+      this->mode = Teleoperation;
     }
   }else if(action == "S"  || action == "SS"){ //start
     if (action == "SS") this->ResetEveryThing();
@@ -440,11 +461,26 @@ void BBot::performActionWithSerial(String str){
 }
 
 void BBot::prepareForMovement(void){
-  if(this->goalMode != Teleoperation){ this->RFID(); this->IRs(); return; }
-  if(this->isActive){
-    if(this->distanceFromUltrasonic() > 40){
+  if(this->goalMode != Teleoperation && this->goalMode != ObstacleAvoidance){ this->RFID(); this->IRs(); return; }
+  if(! this->isActive){ return; }
+  if(this->goalMode != ObstacleAvoidance){
+    if(this->distanceFromUltrasonic(ultraTop) > 40){
+      this->timer.update();
+    }else{
+      this->balloonCounter = 0;
+    }
+    if(this->balloonCounter > 6)
+    {
       this->isActive = !this->isActive;
       Serial.print("F");
     }
+    return;
+  }
+  if(this->distanceFromUltrasonic(ultraRight) < 30 && distanceFromUltrasonic(ultraLeft) < 30){
+    this->teleoperation(-30, 0);
+  }else if(this->distanceFromUltrasonic(ultraLeft) < 30){
+    this->teleoperation(-30, 20);
+  }else if(this->distanceFromUltrasonic(ultraRight) < 30){
+    this->teleoperation(-30,-20 );
   }
 }

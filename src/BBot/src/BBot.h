@@ -80,6 +80,7 @@ forward = 604
 #include <MFRC522.h>
 #include <SoftwareSerial.h>
 #include "config/global.h"
+#include "Timer/Timer.h"
 #include <iostream>
 #include <map>
 
@@ -93,6 +94,7 @@ using namespace std;
   3. RFID level 2 (cardProgrammer)
   4. RFID programming
   5. Pure line-following
+  6. Obstacle avoidance
 */
 enum Mode {
   Teleoperation, //1
@@ -101,7 +103,17 @@ enum Mode {
   RFIDProgramming, //4
   LineFollowing,
   Logic, //5
-  Loop //6
+  Loop, //6
+  ObstacleAvoidance
+};
+/*
+  Ultrasonics Positions
+
+*/
+enum Ultrasonics {
+  ultraTop,
+  ultraRight,
+  ultraLeft
 };
 /**
   ## Available Actions [needed with RFID 1 & RFID 2]
@@ -211,7 +223,7 @@ class BBot{
       ----------
       called in void setup function.
     */
-    void setupUltrasonic(int trig, int echo);
+    void setupUltrasonic(int trigUp, int echoUp, int trigRight, int echoRight,int trigLeft, int echoLeft);
     /**
       setupCircuitComponents function:
       @params:
@@ -311,7 +323,7 @@ class BBot{
       ----------
       perform the actual movement of the robot.
     */
-    float distanceFromUltrasonic();
+    float distanceFromUltrasonic(Ultrasonics ultrasonics);
     /**
       ResetEveryThing function:
       @params:
@@ -346,6 +358,16 @@ class BBot{
 
     void performActionWithSerial(String str);
     void prepareForMovement(void);
+
+    /*
+      Timer
+      Object timer to check ultrasonic status
+      counter
+    */
+    Timer timer;
+    int balloonCounter;
+    void balloonCounterIncrement();
+
   private:
     /**
       stopForever function:
@@ -365,7 +387,7 @@ class BBot{
     int _motorA1, _motorA2, _motorB1, _motorB2;
     int _IR1, _IR2, _IR3;
     int _a, _b, _c, _d, _e, _f, _g; //seven segment
-    int _trig, _echo; //ULTRASONIC
+    int _trigUp, _echoUp, _trigRight, _echoRight, _trigLeft, _echoLeft; //ULTRASONIC
     int _greenLED, _redLED, _buzzer;
     /*
       _velocityLeftMotor and _velocityRightMotor: used after applying mathematical equation in movement(_)
@@ -388,6 +410,10 @@ class BBot{
     */
     Mode mode, goalMode;
     /*
+      ultrasonics enumeration
+    */
+    Ultrasonics ultrasonics;
+    /*
       action variable used in RFID operation where it can be changed according
       to the action read on the card.
     */
@@ -403,6 +429,8 @@ class BBot{
       and ready to play the game on the programmed command on each card.
     */
     bool doneSetup;
+
+
 };
 
 #endif
