@@ -378,7 +378,6 @@ float BBot::distanceFromUltrasonic(Ultrasonics ultrasonics){
         echo = this->_echoLeft;
         trig = this->_trigLeft;
     }
-
     digitalWrite(trig,LOW);
     delayMicroseconds(2);
     digitalWrite(trig,HIGH);
@@ -463,31 +462,12 @@ void BBot::performActionWithSerial(String str){
 void BBot::prepareForMovement(void){
   if(this->goalMode != Teleoperation && this->goalMode != ObstacleAvoidance){ this->RFID(); this->IRs(); return; }
   if(! this->isActive){ return; }
-  if(this->goalMode != ObstacleAvoidance){
-    if(this->distanceFromUltrasonic(ultraTop) < 40){
-      this->_balloonCounter = 0;
-    }
-    if(this->_balloonCounter > this->_timerThreshold){
-      this->isActive = !this->isActive;
-      Serial.print("F");
-    }
-    return;
-  }
+
   if(this->distanceFromUltrasonic(ultraRight) < 30 && distanceFromUltrasonic(ultraLeft) < 30){
     this->teleoperation(-30, 0);
   }else if(this->distanceFromUltrasonic(ultraLeft) < 30){
     this->teleoperation(-30, 20);
   }else if(this->distanceFromUltrasonic(ultraRight) < 30){
-    this->teleoperation(-30,-20);
-  }
-}
-
-bool BBot::isTimerNeeded(void){
-  return this->goalMode == Teleoperation;
-}
-
-void BBot::timerCallback(void){
-  if (this->goalMode == Teleoperation){
-    this->_balloonCounter++;
+    this->teleoperation(-30,-20 );
   }
 }
