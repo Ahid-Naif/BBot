@@ -5,31 +5,27 @@
 #include <TimerOne.h>
 #include <string.h>
 
-struct Pins {
-  int motorA1 = 2;
-  int motorA2 = 3;
-  int motorB1 = 8;
-  int motorB2 = 9;
-  int echoUp = 7;
-  int trigUp = 6;
-  int echoRight = 12;
-  int trigRight = 13;
-  int echoLeft = 10;
-  int trigLeft = 11;
-  int SS = 53;
-  int RST = 5;
-} Pins;
+//pins
+int motorA1 = 2;
+int motorA2 = 3;
+int motorB1 = 8;
+int motorB2 = 9;
+int echoUp = 7;
+int trigUp = 6;
+int echoRight = 12;
+int trigRight = 13;
+int echoLeft = 10;
+int trigLeft = 11;
+int SS_PIN = 53;
+int RST_PIN = 5;
 
-struct Constants {
-  int timerInterval = 5000;
-  int counterThreshold = 5;
-} Constants;
-
+//constants & variables
+int counterThreshold = 5;
 int balloonCounter = 0;
-String str;
-MFRC522 rfid(Pins.SS, Pins.RST);
-BBot myRobot(rfid);
 
+String str;
+MFRC522 rfid(SS_PIN, RST_PIN);
+BBot myRobot(rfid);
 
 void serialEvent() {
   while( Serial.available() ) {
@@ -38,64 +34,35 @@ void serialEvent() {
   }
 }
 
-void setupPins() {
-  pinMode(Pins.motorA1, OUTPUT);
-  pinMode(Pins.motorA2, OUTPUT);
-  pinMode(Pins.motorB1, OUTPUT);
-  pinMode(Pins.motorB2, OUTPUT);
-  pinMode(Pins.echoUp, INPUT);
-  pinMode(Pins.trigUp, OUTPUT);
-  pinMode(Pins.echoRight, INPUT);
-  pinMode(Pins.trigRight, OUTPUT);
-  pinMode(Pins.echoLeft, INPUT);
-  pinMode(Pins.trigLeft, OUTPUT);
-}
-
-void setupBBot() {
+void setup() {
+  //pins
+  pinMode(motorA1, OUTPUT);
+  pinMode(motorA2, OUTPUT);
+  pinMode(motorB1, OUTPUT);
+  pinMode(motorB2, OUTPUT);
+  pinMode(echoUp, INPUT);
+  pinMode(trigUp, OUTPUT);
+  pinMode(echoRight, INPUT);
+  pinMode(trigRight, OUTPUT);
+  pinMode(echoLeft, INPUT);
+  pinMode(trigLeft, OUTPUT);
+  //bbot
   myRobot.setMode(Teleoperation);
-  myRobot.setupMotors(
-    Pins.motorA1,
-    Pins.motorA2,
-    Pins.motorB1,
-    Pins.motorB2
-  );
-  myRobot.setupUltrasonic(
-    Pins.trigUp,
-    Pins.echoUp,
-    Pins.trigRight,
-    Pins.echoRight,
-    Pins.trigLeft,
-    Pins.echoLeft
-  );
-}
-
-void setupSerial() {
+  myRobot.setupMotors(motorA1, motorA2, motorB1, motorB2);
+  myRobot.setupUltrasonics(trigUp, echoUp, trigRight, echoRight, trigLeft, echoLeft);
+  //serial
   Serial.begin(115200);
   Serial.flush();
   Serial.setTimeout(0);
-}
-
-void setupRFID() {
+  //rfid
   SPI.begin();
   rfid.PCD_Init();
-}
-
-void setupTimer() {
-  Timer1.initialize(Constants.timerInterval);
+  //timer
+  Timer1.initialize(100000);
   Timer1.attachInterrupt( timerCallback );
 }
 
-void setup() {
-  setupPins();
-  setupBBot();
-  setupSerial();
-  setupRFID();
-  setupTimer();
-}
-
 void loop() {
-  if(! myRobot.isActive) { return ; }
-
   //@startContainer
   myRobot.prepareForMovement();
   myRobot.movement();
@@ -104,16 +71,18 @@ void loop() {
 }
 
 void timerCallback() {
-  if(myRobot.goalMode != Teleoperation || ! myRobot.isActive) { return ; }
+  //myRobot.timerCallback();
+  if(myRobot.goalMode != Teleoperation || !myRobot.isActive) { return ; }
 
-  if(myRobot.distanceFromUltrasonic(ultraTop) < 40){
+  if(myRobot.distanceFromUltrasonic(BackUltrasonic) < 40){
     balloonCounter = 0;
   }else {
     balloonCounter++;
   }
 
-  if(balloonCounter > Constants.counterThreshold) {
+  if(balloonCounter > counterThreshold) {
+    balloonCounter = 0;
     Serial.print("F");
-    myRobot.isActive = ! myRobot.isActive;
+    myRobot.isActive = false;
   }
 }

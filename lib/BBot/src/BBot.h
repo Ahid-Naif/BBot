@@ -110,9 +110,9 @@ enum Mode {
 
 */
 enum Ultrasonics {
-  ultraTop,
-  ultraRight,
-  ultraLeft
+  BackUltrasonic,
+  RightUltrasonic,
+  LeftUltrasonic
 };
 /**
   ## Available Actions [needed with RFID 1 & RFID 2]
@@ -190,29 +190,6 @@ class BBot{
     */
     void setupIRs(int leftIR, int middleIR, int rightIR);
     /**
-      setupSevenSegment function:
-        _         a
-      |   |     f   b
-        -   =>    g
-      |   |     e   c
-        -         d
-      @params:
-      a: digital pin connected with a on 7-segment
-      b: digital pin connected with b on 7-segment
-      c: digital pin connected with c on 7-segment
-      d: digital pin connected with d on 7-segment
-      e: digital pin connected with e on 7-segment
-      f: digital pin connected with f on 7-segment
-      g: digital pin connected with g on 7-segment
-      @return:
-      void
-      ----------
-      called in void setup function.
-      feel free to use other method for 7-segment like i2c,
-      we had chosen the simplest one for educational purpose.
-    */
-    void setupSevenSegment(int a, int b, int c, int d, int e, int f, int g);
-    /**
       setupUltrasonic function:
       @params:
       trig: the digital pin that connected to trig terminal on the ultrasonic
@@ -222,20 +199,7 @@ class BBot{
       ----------
       called in void setup function.
     */
-    void setupUltrasonic(int trigUp, int echoUp, int trigRight, int echoRight,int trigLeft, int echoLeft);
-    /**
-      setupCircuitComponents function:
-      @params:
-      redLED: the digital pin that connected to the red LED.
-      greenLED: the digital pin that connected to the green LED.
-      buzzer: the digital pin that connected to the buzzer.
-      @return:
-      void
-      ----------
-      called in void setup function.
-      MAKE SURE to limit the current by adding two resistors in series with the two red and green LEDs.
-    */
-    void setupCircuitComponents(int redLED, int greenLED, int buzzer);
+    void setupUltrasonics(int trigUp, int echoUp, int trigRight, int echoRight,int trigLeft, int echoLeft);
     /**
       IRs function:
       @params:
@@ -269,28 +233,6 @@ class BBot{
       link the current card with the needed action.
     */
     void linkCurrentCardWithAction(String cardAction);
-    /**
-      setNumberOnSevenSegment function:
-      @params:
-      number: the needed number to be shown on the 7-segment(0-9)
-      @return:
-      void
-      ----------
-      set the needed number on the 7-segment chip.
-    */
-    void setNumberOnSevenSegment(int number);
-    /**
-      countOnSevenSegment function:
-      @params:
-      from: starting point
-      to: ending point
-      delayDuration: the needed delay between each iteration
-      @return:
-      void
-      ----------
-      it uses setNumberOnSevenSegment(_) to count from-to specific numbers with given delay.
-    */
-    bool countOnSevenSegment(int from, int to, int delayDuration);
     /**
       teleoperation function:
       @params:
@@ -332,7 +274,7 @@ class BBot{
       ----------
       Turns off all LEDs, reset currentCardId to zero and it call setNumberOnSevenSegment(-1) to clear 7-segment output.
     */
-    void ResetEveryThing(void);
+    void resetEveryThing(void);
     /**
       getValueFromString function:
       @params:
@@ -357,14 +299,9 @@ class BBot{
 
     void performActionWithSerial(String str);
     void prepareForMovement(void);
+    void obstacleAvoidanceLogicHandler();
+    void timerCallback(void);
 
-    /*
-      Timer
-      Object timer to check ultrasonic status
-      counter
-    */
-
-    void getGoalMode(void);
     /*
       the differance between mode and goalMode is that mode can be changed
       according to the need anytime but goalMode cannot be changed while the
@@ -372,10 +309,9 @@ class BBot{
     */
     Mode mode, goalMode;
     /*
-      ultrasonics enumeration
+      Ultrasonics enumeration
     */
     Ultrasonics ultrasonics;
-
   private:
     /**
       stopForever function:
@@ -387,16 +323,11 @@ class BBot{
       stop every thing in the robot.
     */
     void stopForever(void);
-    /**
-
-    */
     MFRC522& _rfid;
     /** other useful private variables **/
     int _motorA1, _motorA2, _motorB1, _motorB2;
     int _IR1, _IR2, _IR3;
-    int _a, _b, _c, _d, _e, _f, _g; //seven segment
-    int _trigUp, _echoUp, _trigRight, _echoRight, _trigLeft, _echoLeft; //ULTRASONIC
-    int _greenLED, _redLED, _buzzer;
+    int _backUltrasonicTrig, _backUltrasonicEcho, _rightUltrasonicTrig, _rightUltrasonicEcho, _leftUltrasonicTrig, _leftUltrasonicEcho;
     /*
       _velocityLeftMotor and _velocityRightMotor: used after applying mathematical equation in movement(_)
       function where this values will assigned to the left and right motors respectively.
@@ -429,8 +360,6 @@ class BBot{
       and ready to play the game on the programmed command on each card.
     */
     bool doneSetup;
-
-
 };
 
 #endif
