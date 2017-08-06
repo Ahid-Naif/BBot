@@ -6,10 +6,10 @@
 #include <string.h>
 
 //pins
-int motorA1 = 2;
-int motorA2 = 3;
-int motorB1 = 8;
-int motorB2 = 9;
+int motorA1 = 6; //
+int motorA2 = 7;
+int motorB1 = 9;
+int motorB2 = 8;
 int echoUp = 7;
 int trigUp = 6;
 int echoRight = 12;
