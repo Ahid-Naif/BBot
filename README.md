@@ -27,6 +27,5 @@ Feel free to pull any request or issue you find to improve it.
 
 ## Circuit
 
-#### Color Code
 
-![MacDown logo](./docs/circuit/colorCode.png)
+![Color Code](https://raw.githubusercontent.com/RachisSystems/BBot/master/docs/Circuit/colorCode.png)
