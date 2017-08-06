@@ -24,3 +24,9 @@ This is the original library for B-Bot product, it is an open-source library for
 Feel free to pull any request or issue you find to improve it.
 
   ->->->->-><-<-<-<-<-<-<-<- Copyright© - 2017 | All Rights Reserved ->->->->-><-<-<-<-<-<-<-<-
+
+## Circuit
+
+#### Color Code
+
+![MacDown logo](./docs/circuit/colorCode.png)
