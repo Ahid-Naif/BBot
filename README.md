@@ -33,7 +33,7 @@ BBot Library:
 
 ---
 
->Important Note:
+> Note:
 
 This is the original library for BBot product, it is an open-source library for NON-COMMERCIAL use only.
 Feel free to pull any request or issue you find to improve it.
