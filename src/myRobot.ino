@@ -6,7 +6,7 @@
 #include <string.h>
 
 //pins
-int motorA1 = 6; //
+int motorA1 = 6;
 int motorA2 = 7;
 int motorB1 = 9;
 int motorB2 = 8;
@@ -23,14 +23,14 @@ int RST_PIN = 5;
 int counterThreshold = 5;
 int balloonCounter = 0;
 
-String str;
+String serialString;
 MFRC522 rfid(SS_PIN, RST_PIN);
 BBot myRobot(rfid);
 
 void serialEvent() {
   while( Serial.available() ) {
-    str = Serial.readString();
-    myRobot.performActionWithSerial(str);
+    serialString = Serial.readString();
+    myRobot.performActionWithSerial(serialString);
   }
 }
 

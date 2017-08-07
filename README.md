@@ -27,5 +27,11 @@ Feel free to pull any request or issue you find to improve it.
 
 ## Circuit
 
+> Color Code
 
 ![Color Code](https://raw.githubusercontent.com/RachisSystems/BBot/master/docs/Circuit/colorCode.png)
+
+> Jumpers Layout
+
+- bottom layer
+![Jumpers Layout](https://raw.githubusercontent.com/RachisSystems/BBot/master/docs/Circuit/jumpersLayout/bottomLayer.png)
