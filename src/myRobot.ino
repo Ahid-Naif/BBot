@@ -18,7 +18,7 @@ int echoLeft = 10;
 int trigLeft = 11;
 int SS_PIN = 53;
 int RST_PIN = 5;
-
+int rightIR =41, middleIR = 42, leftIR= 43;
 //constants & variables
 int counterThreshold = 5;
 int balloonCounter = 0;
@@ -46,10 +46,15 @@ void setup() {
   pinMode(trigRight, OUTPUT);
   pinMode(echoLeft, INPUT);
   pinMode(trigLeft, OUTPUT);
+  pinMode(rightIR,INPUT);
+  pinMode(middleIR,INPUT);
+  pinMode(leftIR,INPUT);
+
   //bbot
   myRobot.setMode(Teleoperation);
   myRobot.setupMotors(motorA1, motorA2, motorB1, motorB2);
   myRobot.setupUltrasonics(trigUp, echoUp, trigRight, echoRight, trigLeft, echoLeft);
+  myRobot.setupIRs(leftIR,middleIR,rightIR);
   //serial
   Serial.begin(115200);
   Serial.flush();
@@ -64,14 +69,8 @@ void setup() {
 
 void loop() {
   //@startContainer
-  // if(myRobot.isActive)
-  //   Serial.println(myRobot._pdValue);
-  // myRobot.prepareForMovement();
-  // myRobot.movement();
-  myRobot.IRs();
-  myRobot.calculate_PID();
-  myRobot.motorsControl();
-
+  myRobot.prepareForMovement();
+  myRobot.movement();
   //@newContent
   //@endContainer
 }
@@ -85,7 +84,6 @@ void timerCallback() {
   }else {
     balloonCounter++;
   }
-
   if(balloonCounter > counterThreshold) {
     balloonCounter = 0;
     Serial.print("F");
