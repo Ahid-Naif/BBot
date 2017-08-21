@@ -301,7 +301,8 @@ class BBot{
     void prepareForMovement(void);
     void obstacleAvoidanceLogicHandler();
     void timerCallback(void);
-
+    void calculate_PID();
+    void motorsControl();
     /*
       the differance between mode and goalMode is that mode can be changed
       according to the need anytime but goalMode cannot be changed while the
@@ -312,6 +313,8 @@ class BBot{
       Ultrasonics enumeration
     */
     Ultrasonics ultrasonics;
+    int _p, _d,_kP, _kD, _pdValue, _error, _previousError;
+
   private:
     /**
       stopForever function:
@@ -363,3 +366,4 @@ class BBot{
 };
 
 #endif
+

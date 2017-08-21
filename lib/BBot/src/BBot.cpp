@@ -11,8 +11,6 @@ const struct {
   int velocityMax = 255;
   int velocityMin = -255;
   double v_move = 150;
-  int w_turn = 60;
-  int w_sharpTurn = 100;
   double b = 1;
 } constants;
 
@@ -62,39 +60,42 @@ void BBot::setupUltrasonics(int trigUp, int echoUp, int trigRight, int echoRight
   this->_leftUltrasonicEcho = echoLeft;
 }
 
-int lastStateOfLineFollowing = 0;
 void BBot::IRs(){
-  if(this->mode != LineFollowing) {return;}
+//  if(this->mode != LineFollowing) {return;}
+
   int leftIR = digitalRead(this->_IR1);
   int middleIR = digitalRead(this->_IR2);
   int rightIR = digitalRead(this->_IR3);
   if(( leftIR && !middleIR && rightIR ) || ( !leftIR && middleIR && !rightIR ) || ( leftIR && middleIR && rightIR ) ){ //forward
-    this->_linearVelocity = constants.v_move;
-    this->_angularVelocity = 0;
+    this->_error = 0;
   }else if(leftIR && middleIR && !rightIR){ //Left
-    this->_linearVelocity = constants.v_move/2;
-    this->_angularVelocity = constants.w_turn;
+    this->_error = -1;
   }else if(leftIR && !middleIR && !rightIR){ //SharpLeft
-    lastStateOfLineFollowing = 1;
-    this->_linearVelocity = 0;
-    this->_angularVelocity = constants.w_sharpTurn;
+    this->_error = -2;
   }else if(!leftIR && middleIR && rightIR){ //Right
-    this->_linearVelocity = constants.v_move/2;
-    this->_angularVelocity = -constants.w_turn;
+
+    this->_error = 1;
   }else if(!leftIR && !middleIR && rightIR){ //SharpRight
-    lastStateOfLineFollowing = 2;
-    this->_linearVelocity = 0;
-    this->_angularVelocity = -constants.w_sharpTurn;
-  }else if(!leftIR && !middleIR && !rightIR){ //if lost refere back to the prev. status
-    if(lastStateOfLineFollowing == 1){
-      this->_linearVelocity = constants.w_sharpTurn/2;
-      this->_angularVelocity = constants.w_sharpTurn/2;
-    }else if(lastStateOfLineFollowing == 2){
-      this->_linearVelocity = constants.w_sharpTurn/2;
-      this->_angularVelocity = -constants.w_sharpTurn/2;
-    }
+    this->_error = 2;
   }
+
 }
+
+int initialSpeed = 0;
+void BBot::calculate_PID(){
+  initialSpeed = 120;
+  this->_p = this->_error;
+  this->_d = this->_error - this->_previousError;
+  //tunning kp and kd
+  this->_kP = 16;
+  this->_kD = 12;
+  this->_pdValue = (this->_kP*this->_p) + (this->_kD*this->_d)+5;
+  this->_previousError = this->_error;
+  this->_velocityRightMotor = constrain((initialSpeed - this->_pdValue),-255,255);
+  this->_velocityLeftMotor = constrain((initialSpeed + this->_pdValue),-255,255);
+
+}
+
 
 void BBot::RFID(){
   if(!this->isActive){ return; }
@@ -232,8 +233,7 @@ void BBot::movement(){
   }else{
     this->teleoperation(0,0);
   }
-  this->_velocityRightMotor = constrain((this->_linearVelocity - constants.b * this->_angularVelocity),-255,255);
-  this->_velocityLeftMotor = constrain((this->_linearVelocity + constants.b * this->_angularVelocity),-255,255);
+
   if(this->_velocityRightMotor<0){
       analogWrite(this->_motorA1,this->_velocityRightMotor * -1);
       analogWrite(this->_motorA2,0);
@@ -357,10 +357,18 @@ void BBot::obstacleAvoidanceLogicHandler(){
 }
 
 void BBot::prepareForMovement(){
-  if(this->goalMode != Teleoperation && this->goalMode != ObstacleAvoidance){ this->RFID(); this->IRs(); return; }
+  if(this->goalMode != Teleoperation && this->goalMode != ObstacleAvoidance){ this->RFID();this->IRs();this->calculate_PID(); return; }
   //this->obstacleAvoidanceLogicHandler();
 }
 
 void BBot::timerCallback(){
 
 }
+void BBot::motorsControl()
+{
+  analogWrite(this->_motorA2,this->_velocityRightMotor);
+  analogWrite(this->_motorA1,0);
+  analogWrite(this->_motorB2,this->_velocityRightMotor);
+  analogWrite(this->_motorB1,0);
+}
+

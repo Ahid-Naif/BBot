@@ -10,15 +10,12 @@ int motorA1 = 6;
 int motorA2 = 7;
 int motorB1 = 9;
 int motorB2 = 8;
-int echoUp = 45;
-int trigUp = 44;
-int echoRight = 47;
-int trigRight = 46;
-int echoLeft = 49;
-int trigLeft = 48;
-int rightIR = 41;
-int middleIR = 42;
-int leftIR = 43;
+int echoUp = 7;
+int trigUp = 6;
+int echoRight = 12;
+int trigRight = 13;
+int echoLeft = 10;
+int trigLeft = 11;
 int SS_PIN = 53;
 int RST_PIN = 5;
 
@@ -49,15 +46,10 @@ void setup() {
   pinMode(trigRight, OUTPUT);
   pinMode(echoLeft, INPUT);
   pinMode(trigLeft, OUTPUT);
-  pinMode(rightIR, INPUT);
-  pinMode(middleIR, INPUT);
-  pinMode(leftIR, INPUT);
-
   //bbot
   myRobot.setMode(Teleoperation);
   myRobot.setupMotors(motorA1, motorA2, motorB1, motorB2);
   myRobot.setupUltrasonics(trigUp, echoUp, trigRight, echoRight, trigLeft, echoLeft);
-  myRobot.setupIRs(leftIR, middleIR, rightIR);
   //serial
   Serial.begin(115200);
   Serial.flush();
@@ -72,9 +64,13 @@ void setup() {
 
 void loop() {
   //@startContainer
-  myRobot.prepareForMovement();
-  myRobot.movement();
-
+  // if(myRobot.isActive)
+  //   Serial.println(myRobot._pdValue);
+  // myRobot.prepareForMovement();
+  // myRobot.movement();
+  myRobot.IRs();
+  myRobot.calculate_PID();
+  myRobot.motorsControl();
 
   //@newContent
   //@endContainer
@@ -96,3 +92,4 @@ void timerCallback() {
     myRobot.isActive = false;
   }
 }
+
