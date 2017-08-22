@@ -318,7 +318,7 @@ void BBot::performActionWithSerial(String str){
       this->goalMode = ObstacleAvoidance;
       this->mode = Teleoperation;
     }
-  }else if(action == "S"  || action == "SS"){ //start 
+  }else if(action == "S"  || action == "SS"){ //start
     if (action == "SS") this->resetEveryThing();
     this->isActive = true;
   }else if(action == "P"){ //pause
@@ -374,4 +374,3 @@ void BBot::motorsControl()
   analogWrite(this->_motorB1,0);
 
 }
-
