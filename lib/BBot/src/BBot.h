@@ -255,7 +255,7 @@ class BBot{
       ----------
       perform the actual movement of the robot.
     */
-    void movement(void);
+    void move(void);
     /**
       distanceFromUltrasonic function:
       @params:
@@ -300,10 +300,15 @@ class BBot{
 
     void performActionWithSerial(String str);
     void prepareForMovement(void);
-    void obstacleAvoidanceLogicHandler();
+    void obstacleAvoidanceHandler(void);
     void timerCallback(void);
-    void calculate_PID();
-    void motorsControl();
+    void calculatePID(void);
+    void RFID1GameHandler(int cardId);
+    void RFID2GameHandler(int cardId);
+    void RFIDProgrammingGameHandler(int cardId);
+    void loopGameHandler(int cardId);
+    void logicDesignerGameHandler(int cardId);
+    void RFID1andRFID2MovementHandler(void);
     /*
       the differance between mode and goalMode is that mode can be changed
       according to the need anytime but goalMode cannot be changed while the
@@ -314,8 +319,6 @@ class BBot{
       Ultrasonics enumeration
     */
     Ultrasonics ultrasonics;
-    int _p, _d,_kP, _kD, _pdValue, _error, _previousError;
-
   private:
     /**
       stopForever function:
@@ -326,24 +329,22 @@ class BBot{
       ----------
       stop every thing in the robot.
     */
+
     void stopForever(void);
     MFRC522& _rfid;
     /** other useful private variables **/
     int _motorA1, _motorA2, _motorB1, _motorB2;
     int _IR1, _IR2, _IR3;
     int _backUltrasonicTrig, _backUltrasonicEcho, _rightUltrasonicTrig, _rightUltrasonicEcho, _leftUltrasonicTrig, _leftUltrasonicEcho;
+    int _p, _d, _kP=2, _kD=0, _pdValue, _error=0, _previousError;
     /*
       _velocityLeftMotor and _velocityRightMotor: used after applying mathematical equation in movement(_)
       function where this values will assigned to the left and right motors respectively.
     */
-    double _linearVelocity, _angularVelocity, _velocityLeftMotor, _velocityRightMotor;
+    double _linearVelocity, _angularVelocity;
     int iterations; // to specifies the maximum number of rounds for  "Loop" Mode
     int numberRounds; // it represents the current round number
     String and_or; // its value is either A which stands for "and", or O which stands for "or"
-    /*
-      numberOfCardCanBeRead: used to count how many cards left can be read before losing the match in RFID1 and RFID2.
-    */
-    int numberOfCardCanBeRead;
     Map<int, String> cards;
     Map<string, int> logicalCards; // this map is to read the cards of the "Logic" Mode
 

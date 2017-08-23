@@ -3,7 +3,7 @@
 
 ## R&D Department
 
->### BBot
+> ### BBot
 
 The BBot aims to provide a useful complementary tool for STEM education through robotics. <br>
 The invention resides broadly in a flexible and modular robot that can be built by children
