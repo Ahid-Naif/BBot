@@ -24,7 +24,7 @@ BBot Library:
 
 > Color Code
 
-![Color Code](https://raw.githubusercontent.com/RachisSystems/BBot/master/docs/Circuit/colorCode.png)
+![Color Code](https://bitbucket.org/Arduiner/bbot-arduino/src/75c9b99923f919b0b8df5e15ffb904312ad30d52/docs/Circuit/jumpersLayout/bottomLayer.png)
 
 > Jumpers Layout
 
@@ -38,4 +38,4 @@ BBot Library:
 This is the original library for BBot product, it is an open-source library for NON-COMMERCIAL use only.
 Feel free to pull any request or issue you find to improve it.
 
-  ->->->->-><-<-<-<-<-<-<-<- CopyrightÂ© - 2017 | All Rights Reserved ->->->->-><-<-<-<-<-<-<-<-
+  ->->->->-><-<-<-<-<-<-<-<- Copyright© - 2017 | All Rights Reserved ->->->->-><-<-<-<-<-<-<-<-
