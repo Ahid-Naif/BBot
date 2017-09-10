@@ -29,7 +29,7 @@ BBot Library:
 > Jumpers Layout
 
 - bottom layer
-![Jumpers Layout](docs/Circuit/jumpersLayout/bottomLayer.png )
+![Jumpers Layout](https://bitbucket.org/Arduiner/bbot-arduino/src/8a8ba3db1501e24d3817105b3b35cf977787c3e2/docs/Circuit/jumpersLayout/?at=master/bottomLayer.png )
 
 ---
 
