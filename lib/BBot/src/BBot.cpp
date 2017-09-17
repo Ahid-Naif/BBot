@@ -94,9 +94,10 @@ void BBot::RFID(){
   if (!this->_rfid.PICC_IsNewCardPresent() || !this->_rfid.PICC_ReadCardSerial()) { return; }
 
   int cardId = this->_rfid.uid.uidByte[0] + this->_rfid.uid.uidByte[1] + this->_rfid.uid.uidByte[2] + this->_rfid.uid.uidByte[3];
+  Serial.println(cardId);
   this->_rfid.PICC_HaltA();
   this->_rfid.PCD_StopCrypto1();
-
+  return;
   if(this->goalMode == RFID1 && this->mode == LineFollowing){ this->RFID1GameHandler(cardId); }
   else if(this->goalMode == RFID2){ this->RFID2GameHandler(cardId); }
   else if(this->goalMode == RFIDProgramming){ this->RFIDProgrammingGameHandler(cardId); }
@@ -110,10 +111,10 @@ void BBot::RFID1GameHandler(int cardId){
     Serial.print("F");
     this->isActive = false;
     this->mode = LineFollowing;
-  }else if( cardId == 512 || cardId == 764 || cardId == 407 ){
+  }else if( cardId == 372 || cardId == 764 || cardId == 407 ){
     this->action = Right;
     Serial.print("C1");
-  }else if( cardId == 685 || cardId == 692){
+  }else if( cardId == 685 || cardId == 270){
     this->action = Left;
     Serial.print("C1");
   }else if( cardId == 763){
