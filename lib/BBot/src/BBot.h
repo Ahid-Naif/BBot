@@ -336,7 +336,7 @@ class BBot{
     int _motorA1, _motorA2, _motorB1, _motorB2;
     int _IR1, _IR2, _IR3;
     int _backUltrasonicTrig, _backUltrasonicEcho, _rightUltrasonicTrig, _rightUltrasonicEcho, _leftUltrasonicTrig, _leftUltrasonicEcho;
-    int _p=0, _d=0, _kP=4, _kD=6, _pdValue=0, _error=0, _previousError=0;
+    float _p=0, _d=0, _kP=4, _kD=10, _pdValue=0, _error=0, _previousError=0;
     /*
       _velocityLeftMotor and _velocityRightMotor: used after applying mathematical equation in movement(_)
       function where this values will assigned to the left and right motors respectively.

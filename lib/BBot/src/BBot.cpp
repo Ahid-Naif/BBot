@@ -70,11 +70,11 @@ void BBot::IRs(){
   }else if(leftIR && middleIR && !rightIR){ //Left
     this->_error = -1;
   }else if(leftIR && !middleIR && !rightIR){ //SharpLeft
-    this->_error = -2;
+    this->_error = -3;
   }else if(!leftIR && middleIR && rightIR){ //Right
     this->_error = 1;
   }else if(!leftIR && !middleIR && rightIR){ //SharpRight
-    this->_error = 2;
+    this->_error = 3;
   }
 }
 
