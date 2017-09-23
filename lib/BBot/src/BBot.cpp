@@ -1,7 +1,8 @@
 #include "BBot.h"
 
 //group all constants together.
-const struct {
+
+ struct {
   int xAngleMax = 45;
   int xAngleMin = -45;
   int yAngleMax = 45;
@@ -11,6 +12,7 @@ const struct {
   int velocityMax = 255;
   int velocityMin = -255;
   double v_move = 150;
+  int line_following_speed = 20;
   double b = 1;
 } constants;
 
@@ -65,16 +67,16 @@ void BBot::IRs(){
   int middleIR = digitalRead(this->_IR2);
   int rightIR = digitalRead(this->_IR3);
 
-  if( leftIR && !middleIR && rightIR ){ //forward
+  if( !leftIR && middleIR && !rightIR ){ //forward
     this->_error = 0;
   }else if(leftIR && middleIR && !rightIR){ //Left
-    this->_error = -1;
-  }else if(leftIR && !middleIR && !rightIR){ //SharpLeft
-    this->_error = -3;
-  }else if(!leftIR && middleIR && rightIR){ //Right
     this->_error = 1;
-  }else if(!leftIR && !middleIR && rightIR){ //SharpRight
+  }else if(leftIR && !middleIR && !rightIR){ //SharpLeft
     this->_error = 3;
+  }else if(!leftIR && middleIR && rightIR){ //Right
+    this->_error = -1;
+  }else if(!leftIR && !middleIR && rightIR){ //SharpRight
+    this->_error = -3;
   }
 }
 
@@ -86,7 +88,7 @@ void BBot::calculatePID(){
   this->_pdValue = (this->_kP * this->_p) + (this->_kD * this->_d);
   this->_previousError = this->_error;
 
-  this->teleoperation(20,-this->_pdValue);
+  this->teleoperation(constants.line_following_speed,this->_pdValue);
 }
 
 void BBot::RFID(){
@@ -94,9 +96,10 @@ void BBot::RFID(){
   if (!this->_rfid.PICC_IsNewCardPresent() || !this->_rfid.PICC_ReadCardSerial()) { return; }
 
   int cardId = this->_rfid.uid.uidByte[0] + this->_rfid.uid.uidByte[1] + this->_rfid.uid.uidByte[2] + this->_rfid.uid.uidByte[3];
+  Serial.println(cardId);
   this->_rfid.PICC_HaltA();
   this->_rfid.PCD_StopCrypto1();
-
+  return;
   if(this->goalMode == RFID1 && this->mode == LineFollowing){ this->RFID1GameHandler(cardId); }
   else if(this->goalMode == RFID2){ this->RFID2GameHandler(cardId); }
   else if(this->goalMode == RFIDProgramming){ this->RFIDProgrammingGameHandler(cardId); }
@@ -118,6 +121,7 @@ void BBot::RFID1GameHandler(int cardId){
     Serial.print("C1");
   }else if( cardId == 763){
     this->action = SpeedUp;
+
     Serial.print("C1");
   }else if( cardId == 271){
     this->action = SlowDown;
@@ -257,9 +261,11 @@ void BBot::RFID1andRFID2MovementHandler(){
       }
       break;
       case SpeedUp:
+      constants.line_following_speed += 20;
         this->mode = LineFollowing;
       break;
       case SlowDown:
+      constants.line_following_speed -= 20;
         this->mode = LineFollowing;
       break;
     }
