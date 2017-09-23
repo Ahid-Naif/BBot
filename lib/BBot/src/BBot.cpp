@@ -117,12 +117,14 @@ void BBot::RFID1GameHandler(int cardId){
   }else if( cardId == 685  || cardId == 270 || cardId == 326 || cardId == 478 || cardId == 512){
     this->action = Left;
     Serial.print("C1");
-  }else if( cardId == 763){
+  }else if( cardId == 763 || cardId == 620){
     this->action = SpeedUp;
-
     Serial.print("C1");
   }else if( cardId == 271){
     this->action = SlowDown;
+    Serial.print("C1");
+  }else if( cardId == 529){
+    this->action = forWard;
     Serial.print("C1");
   }else{
     Serial.print("C1");
@@ -147,10 +149,10 @@ void BBot::RFID2GameHandler(int cardId){
       this->action = Left;
       Serial.print("C1");
     }else if( cardId == 763){
-      //this->action = SpeedUp;
+      this->action = SpeedUp;
       Serial.print("C1");
     }else if( cardId == 271){
-      //this->action = SlowDown;
+      this->action = SlowDown;
       Serial.print("C1");
     }
   }
@@ -244,7 +246,8 @@ void BBot::RFID1andRFID2MovementHandler(){
     switch (this->action) {
       case Right:
       this->teleoperation(0,-30);
-      if((!dr(this->_IR1) && !dr(this->_IR2) && dr(this->_IR3)) || (!dr(this->_IR1) && dr(this->_IR2) && dr(this->_IR3))){
+      if((!dr(this->_IR1) && !dr(this->_IR2) && dr(this->_IR3)) ||
+      (!dr(this->_IR1) && dr(this->_IR2) && dr(this->_IR3))){
         this->mode = LineFollowing;
       }
       break;
@@ -259,13 +262,17 @@ void BBot::RFID1andRFID2MovementHandler(){
       }
       break;
       case SpeedUp:
-      constants.line_following_speed += 20;
+      constants.line_following_speed += 10;
         this->mode = LineFollowing;
       break;
       case SlowDown:
-      constants.line_following_speed -= 20;
+      constants.line_following_speed -= 10;
         this->mode = LineFollowing;
       break;
+      case forWard:
+        teleoperation(30,0);
+        break;
+
     }
   }
 }

@@ -69,8 +69,8 @@ void setup() {
 
 void loop() {
   //@startContainer
-  myRobot.prepareForMovement();
-  myRobot.move();
+   myRobot.prepareForMovement();
+   myRobot.move();
   //@newContent
   //@endContainer
 }

@@ -128,7 +128,8 @@ enum Action{
   Right,
   Left,
   SpeedUp,
-  SlowDown
+  SlowDown,
+  forWard
 };
 
 class BBot{
