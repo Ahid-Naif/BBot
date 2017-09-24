@@ -102,7 +102,8 @@ void BBot::RFID(){
   else if(this->goalMode == RFID2){ this->RFID2GameHandler(cardId); }
   else if(this->goalMode == RFIDProgramming){ this->RFIDProgrammingGameHandler(cardId); }
   else if(this->goalMode == Loop){ this->loopGameHandler(cardId); }
-  else if(this->goalMode == Logic){ this->logicDesignerGameHandler(cardId); }
+  else if(this->goalMode == Logic){ this->logicOperatorHandler(cardId);}//this->logicDesignerGameHandler(cardId); }
+//  else if(this->goalMode == LogicOperator){  }
 }
 
 void BBot::RFID1GameHandler(int cardId){
@@ -349,6 +350,9 @@ void BBot::performActionWithSerial(String str){
     }else if(mode == "7"){
       this->goalMode = ObstacleAvoidance;
       this->mode = Teleoperation;
+    }else if(mode == "8"){
+      this->goalMode = LogicOperator;
+      this->mode = LineFollowing;
     }
   }else if(action == "S"  || action == "SS"){ //start
     if (action == "SS") this->resetEveryThing();
@@ -370,9 +374,20 @@ void BBot::performActionWithSerial(String str){
     this->iterations = this->getValueFromString(str, ':', 1).toInt();
     this->numberRounds = 0;
   }else if(action == "O"){
-    this->logicalCards["A"] = 0;
+    this->status = "ready";
+    // define cards here
+    logicOperatorCards[267] = "zero";
+    logicOperatorCards[373] = "one";
+    logicOperatorCards[682] = "add";
+    logicOperatorCards[508] = "multiply";
+    logicOperatorCards[372] = "end";
+    logicOperatorCards[342] = "start";
+  /*  this->logicalCards["A"] = 0;
     this->logicalCards["B"] = 0;
-    this->and_or = this->getValueFromString(str, ':', 1);
+    this->and_or = this->getValueFromString(str, ':', 1);*/
+  }else if(action == "K"){
+
+
   }
 }
 
@@ -389,6 +404,79 @@ void BBot::obstacleAvoidanceHandler(){
   }else if(distanceFromRightUltrasonic < 30){
     this->teleoperation(-30, -20);
   }
+}
+
+void BBot::logicOperatorHandler(int cardId){
+  this->currentCard = this->logicOperatorCards[cardId];
+  if(!canStart(currentCard)){
+    this->errorFound();
+    return;
+  }
+
+  this->isOperation = (this->currentCard == "multiply") + (this->currentCard == "add");
+  this->isNumber = (this->currentCard == "one") + (this->currentCard == "zero");
+  this->isDone = (this->currentCard == "end");
+  if(this->isNumber){
+    if(this->status == "number")
+      this->errorFound();
+
+    if(this->currentCard == "one") // if it's No. 1 card
+      this->logicValue = true; // value is 1
+    else
+      this->logicValue = false; // valu is 0
+
+    if(this->status == "start"){
+      // it can run in the first time only
+      // it initializes the value of logicResult
+      if(this->logicValue)
+        this->logicResult = true;
+      else
+        this->logicResult = false;
+    }else if(this->status == "operation"){
+      // updates the logicResult value according to the operation
+      if(this->logicOperation == "multiply")
+        this->logicResult *= this->logicValue;
+      else
+        this->logicResult += this->logicValue;
+    }
+    this->status = "number"; // updates status value
+  }else if(this->isOperation){
+    if(this->status != "number")
+      this->errorFound();
+
+    this->status = "operation";
+    this->logicOperation = this->currentCard;
+  }else if(this->isDone){
+    if(this->status != "number"){
+      this->errorFound();
+      return;
+    }
+
+    // print the result to the screen
+    Serial.print("result: ");
+    Serial.println(this->logicResult);
+    Serial.print("F");
+    this->isActive = false;
+  }
+}
+
+void BBot::errorFound(){
+  // print error message
+  Serial.println("Error Found");
+  Serial.print("F");
+  this->isActive = false;
+}
+
+bool BBot::canStart(String currentcard){
+  if(currentcard == "start"){
+    this->status = "start";
+    return true;
+  }
+  else
+    if(this->status != "ready")
+      return true;
+    else
+      return false;
 }
 
 void BBot::prepareForMovement(){

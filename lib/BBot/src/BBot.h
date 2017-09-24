@@ -104,7 +104,8 @@ enum Mode {
   LineFollowing,
   Logic, //5
   Loop, //6
-  ObstacleAvoidance
+  ObstacleAvoidance,
+  LogicOperator // 8
 };
 /*
   Ultrasonics Positions
@@ -310,6 +311,15 @@ class BBot{
     void loopGameHandler(int cardId);
     void logicDesignerGameHandler(int cardId);
     void RFID1andRFID2MovementHandler(void);
+    void logicOperatorHandler(int cardId);
+    void errorFound(void);
+    /*
+    to check if there's a problem with the sequence of the read cards
+    the sequence should be as following:
+    start -> number -> operation -> number -> operation -> number -> ... -> number -> end
+    */
+    bool canStart(String currentcard); //  to check that the first read card is "start" card
+
     /*
       the differance between mode and goalMode is that mode can be changed
       according to the need anytime but goalMode cannot be changed while the
@@ -346,9 +356,18 @@ class BBot{
     int iterations; // to specifies the maximum number of rounds for  "Loop" Mode
     int numberRounds; // it represents the current round number
     String and_or; // its value is either A which stands for "and", or O which stands for "or"
+    String currentCard; // stores the value of the read card at the moment
+    bool logicValue; // its value is either 1 or 0, according to the read card
+    String logicOperation; // its value is either "multiply" or "add", according to the read card
+    bool logicResult; // stores the result of operations that are being done
+    bool isOperation; // returns "true" if the read card is an operation "multiply" or "add"
+    bool isNumber; // returns "true" if the read card is a number
+    bool isDone; // returns "true" if the read card is "end" card
+    String status; // stores the latest status, ready/start/operation/number
+    // it keeps track of the sequence of read cards
     Map<int, String> cards;
-    Map<string, int> logicalCards; // this map is to read the cards of the "Logic" Mode
-
+    Map<String, int> logicalCards; // this map is to read the cards of the "Logic" Mode
+    Map<int, String> logicOperatorCards; // stores values of IDs and their assigned status
 
     /*
       action variable used in RFID operation where it can be changed according
