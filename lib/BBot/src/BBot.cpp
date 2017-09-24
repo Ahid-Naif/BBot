@@ -117,7 +117,7 @@ void BBot::RFID1GameHandler(int cardId){
   }else if( cardId == 685  || cardId == 270 || cardId == 326 || cardId == 478 || cardId == 512){
     this->action = Left;
     Serial.print("C1");
-  }else if( cardId == 763 || cardId == 620){
+  }else if( cardId == 763 || cardId == 369){
     this->action = SpeedUp;
     Serial.print("C1");
   }else if( cardId == 271){
@@ -125,6 +125,9 @@ void BBot::RFID1GameHandler(int cardId){
     Serial.print("C1");
   }else if( cardId == 529){
     this->action = forWard;
+    Serial.print("C1");
+  }else if( cardId == 512){
+    this->mode = RFID1;
     Serial.print("C1");
   }else{
     Serial.print("C1");
@@ -271,6 +274,7 @@ void BBot::RFID1andRFID2MovementHandler(){
       break;
       case forWard:
         teleoperation(30,0);
+        this->mode = LineFollowing;
         break;
 
     }
